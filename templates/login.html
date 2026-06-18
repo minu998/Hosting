@@ -1,0 +1,1473 @@
+{% extends "base.html" %}
+{% block title %}Login — SasiVPS{% endblock %}
+
+{% block head %}
+<style>
+    /* ================================================================
+               LOGIN PAGE SPECIFIC STYLES — NEON THEME
+               ================================================================ */
+    
+    /* ----- Login Container ----- */
+    .login-wrapper {
+        min-height: calc(100vh - var(--nav-height) - 120px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Animated background particles */
+    .login-wrapper::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: 
+            radial-gradient(ellipse at 20% 50%, rgba(0, 255, 136, 0.04) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 50%, rgba(0, 212, 255, 0.04) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 100%, rgba(180, 77, 255, 0.03) 0%, transparent 40%);
+        z-index: 0;
+        animation: login-bg-glow 8s ease-in-out infinite alternate;
+    }
+    @keyframes login-bg-glow {
+        0% { opacity: 0.5; transform: scale(1); }
+        100% { opacity: 1; transform: scale(1.05); }
+    }
+
+    /* Floating particles */
+    .particles {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: rgba(0, 255, 136, 0.15);
+        animation: float-particle linear infinite;
+    }
+    .particle:nth-child(1) { left: 5%; top: 10%; animation-duration: 14s; animation-delay: 0s; width: 6px; height: 6px; }
+    .particle:nth-child(2) { left: 15%; top: 45%; animation-duration: 18s; animation-delay: 2s; }
+    .particle:nth-child(3) { left: 25%; top: 75%; animation-duration: 12s; animation-delay: 4s; width: 8px; height: 8px; }
+    .particle:nth-child(4) { left: 35%; top: 20%; animation-duration: 16s; animation-delay: 1s; }
+    .particle:nth-child(5) { left: 45%; top: 60%; animation-duration: 13s; animation-delay: 3s; width: 5px; height: 5px; }
+    .particle:nth-child(6) { left: 55%; top: 85%; animation-duration: 20s; animation-delay: 5s; }
+    .particle:nth-child(7) { left: 65%; top: 30%; animation-duration: 15s; animation-delay: 2.5s; width: 10px; height: 10px; opacity: 0.05; }
+    .particle:nth-child(8) { left: 75%; top: 55%; animation-duration: 11s; animation-delay: 0.5s; }
+    .particle:nth-child(9) { left: 85%; top: 15%; animation-duration: 19s; animation-delay: 3.5s; width: 7px; height: 7px; }
+    .particle:nth-child(10) { left: 92%; top: 70%; animation-duration: 17s; animation-delay: 1.5s; }
+    .particle:nth-child(11) { left: 10%; top: 90%; animation-duration: 14s; animation-delay: 2s; width: 3px; height: 3px; }
+    .particle:nth-child(12) { left: 50%; top: 5%; animation-duration: 16s; animation-delay: 4s; width: 6px; height: 6px; }
+    .particle:nth-child(13) { left: 70%; top: 92%; animation-duration: 13s; animation-delay: 1s; width: 4px; height: 4px; }
+    .particle:nth-child(14) { left: 30%; top: 50%; animation-duration: 18s; animation-delay: 3s; width: 8px; height: 8px; }
+    .particle:nth-child(15) { left: 88%; top: 40%; animation-duration: 15s; animation-delay: 0s; width: 5px; height: 5px; }
+
+    @keyframes float-particle {
+        0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.2; }
+        25% { transform: translateY(-80px) translateX(40px) scale(1.2); opacity: 0.6; }
+        50% { transform: translateY(-160px) translateX(-30px) scale(0.8); opacity: 0.3; }
+        75% { transform: translateY(-80px) translateX(50px) scale(1.1); opacity: 0.5; }
+        100% { transform: translateY(-240px) translateX(-20px) scale(1); opacity: 0; }
+    }
+
+    /* ----- Login Card ----- */
+    .login-card {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 440px;
+        background: var(--bg-card);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(0, 255, 136, 0.06);
+        border-radius: var(--radius-xl);
+        padding: 44px 38px;
+        box-shadow: var(--shadow-card), 0 0 60px rgba(0, 255, 136, 0.03);
+        animation: login-card-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        transition: all var(--transition-normal);
+    }
+    .login-card:hover {
+        border-color: rgba(0, 255, 136, 0.12);
+        box-shadow: var(--shadow-card-hover), var(--shadow-glow);
+    }
+    @keyframes login-card-in {
+        0% { opacity: 0; transform: scale(0.92) translateY(40px); }
+        100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* ----- Card Border Glow Animation ----- */
+    .login-card::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: var(--radius-xl);
+        padding: 2px;
+        background: var(--gradient-main);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0.08;
+        transition: opacity var(--transition-normal);
+        pointer-events: none;
+    }
+    .login-card:hover::before {
+        opacity: 0.20;
+    }
+
+    /* ----- Card Header ----- */
+    .login-header {
+        text-align: center;
+        margin-bottom: 34px;
+    }
+    .login-header .logo-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: var(--radius-lg);
+        background: var(--gradient-main);
+        display: grid;
+        place-items: center;
+        font-size: 32px;
+        color: #000000;
+        margin: 0 auto 18px;
+        box-shadow: 0 0 50px rgba(0, 255, 136, 0.12);
+        animation: logo-pulse 3s ease-in-out infinite;
+        position: relative;
+        transition: all var(--transition-normal);
+    }
+    .login-header .logo-icon:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 70px rgba(0, 255, 136, 0.20);
+    }
+    .login-header .logo-icon::after {
+        content: '';
+        position: absolute;
+        inset: -6px;
+        border-radius: var(--radius-lg);
+        background: var(--gradient-main);
+        opacity: 0.15;
+        filter: blur(20px);
+        z-index: -1;
+        animation: logo-glow 3s ease-in-out infinite alternate;
+    }
+    @keyframes logo-pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.04); }
+    }
+    @keyframes logo-glow {
+        0% { opacity: 0.15; transform: scale(1); }
+        100% { opacity: 0.35; transform: scale(1.3); }
+    }
+    .login-header h1 {
+        font-size: 1.625rem;
+        font-weight: 800;
+        margin: 0 0 6px;
+        background: var(--gradient-main);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        letter-spacing: -0.02em;
+    }
+    .login-header p {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin: 0;
+        letter-spacing: 0.01em;
+    }
+    .login-header p .highlight {
+        color: #00ff88;
+        font-weight: 600;
+    }
+
+    /* ================================================================
+               SECTION 2: FORM STYLES
+               ================================================================ */
+
+    .form-group {
+        margin-bottom: 20px;
+        position: relative;
+    }
+    .form-group label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 6px;
+        letter-spacing: 0.02em;
+    }
+    .form-group label i {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+    .form-group .input-wrapper {
+        position: relative;
+    }
+    .form-group .input-wrapper .input-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        transition: color var(--transition-fast);
+        pointer-events: none;
+        z-index: 1;
+    }
+    .form-group .input-wrapper input {
+        width: 100%;
+        padding: 13px 14px 13px 46px;
+        background: var(--bg-input);
+        border: 1.5px solid rgba(0, 255, 136, 0.06);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        font-family: var(--font-sans);
+        transition: all var(--transition-fast);
+        outline: none;
+        position: relative;
+        z-index: 0;
+    }
+    .form-group .input-wrapper input::placeholder {
+        color: var(--text-dimmed);
+        font-size: 0.9rem;
+        opacity: 0.7;
+    }
+    .form-group .input-wrapper input:hover {
+        border-color: rgba(0, 255, 136, 0.12);
+        background: var(--bg-input-hover);
+    }
+    .form-group .input-wrapper input:focus {
+        border-color: rgba(0, 255, 136, 0.30);
+        box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.04), 0 0 30px rgba(0, 255, 136, 0.03);
+        background: var(--bg-input-hover);
+    }
+    .form-group .input-wrapper input:focus + .input-icon,
+    .form-group .input-wrapper input:focus ~ .input-icon {
+        color: #00ff88;
+    }
+    .form-group .input-wrapper input.input-error {
+        border-color: rgba(255, 0, 68, 0.30);
+        box-shadow: 0 0 0 4px rgba(255, 0, 68, 0.04);
+    }
+    .form-group .input-wrapper input.input-success {
+        border-color: rgba(0, 255, 136, 0.20);
+    }
+    .form-group .input-wrapper .toggle-password {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all var(--transition-fast);
+        padding: 6px;
+        border-radius: var(--radius-sm);
+        z-index: 1;
+    }
+    .form-group .input-wrapper .toggle-password:hover {
+        color: var(--text-secondary);
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .form-group .input-wrapper .input-validation {
+        position: absolute;
+        right: 48px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.9rem;
+        opacity: 0;
+        transition: all var(--transition-fast);
+        z-index: 1;
+    }
+    .form-group .input-wrapper .input-validation.valid {
+        opacity: 1;
+        color: #00ff88;
+    }
+    .form-group .input-wrapper .input-validation.invalid {
+        opacity: 1;
+        color: #ff0044;
+    }
+
+    .form-helper {
+        display: block;
+        margin-top: 6px;
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        letter-spacing: 0.01em;
+    }
+    .form-helper i {
+        margin-right: 4px;
+        font-size: 0.65rem;
+    }
+    .form-helper.error-text {
+        color: #ff0044;
+    }
+    .form-helper.success-text {
+        color: #00ff88;
+    }
+
+    /* ================================================================
+               SECTION 3: FORM OPTIONS
+               ================================================================ */
+    .form-options {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        padding: 2px 0;
+        font-size: 0.85rem;
+    }
+    .form-options label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 400;
+        transition: color var(--transition-fast);
+        user-select: none;
+    }
+    .form-options label:hover {
+        color: var(--text-secondary);
+    }
+    .form-options label input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #00ff88;
+        cursor: pointer;
+        border-radius: var(--radius-sm);
+        background: var(--bg-input);
+        border: 1.5px solid rgba(0, 255, 136, 0.10);
+        transition: all var(--transition-fast);
+        flex-shrink: 0;
+    }
+    .form-options label input[type="checkbox"]:checked {
+        border-color: #00ff88;
+        box-shadow: 0 0 10px rgba(0, 255, 136, 0.10);
+    }
+    .form-options a {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        transition: all var(--transition-fast);
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+    }
+    .form-options a:hover {
+        color: #00ff88;
+        border-bottom-color: rgba(0, 255, 136, 0.20);
+    }
+
+    /* ================================================================
+               SECTION 4: SUBMIT BUTTON
+               ================================================================ */
+    .btn-submit {
+        width: 100%;
+        padding: 15px 20px;
+        font-size: 1rem;
+        font-weight: 700;
+        border: none;
+        border-radius: var(--radius-md);
+        background: var(--gradient-main);
+        color: #000000;
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        font-family: var(--font-sans);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 40px rgba(0, 255, 136, 0.08);
+        letter-spacing: 0.02em;
+    }
+    .btn-submit::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.10) 0%, transparent 50%, transparent 100%);
+        pointer-events: none;
+    }
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 60px rgba(0, 255, 136, 0.18), 0 8px 32px rgba(0, 0, 0, 0.30);
+    }
+    .btn-submit:active {
+        transform: scale(0.97);
+    }
+    .btn-submit:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+    .btn-submit .btn-icon {
+        font-size: 1.1rem;
+    }
+    .btn-submit .spinner {
+        display: none;
+        width: 22px;
+        height: 22px;
+        border: 2.5px solid rgba(0, 0, 0, 0.12);
+        border-top-color: #000000;
+        border-radius: var(--radius-full);
+        animation: spin 0.7s linear infinite;
+    }
+    .btn-submit.loading .spinner {
+        display: inline-block;
+    }
+    .btn-submit.loading .btn-text {
+        display: none;
+    }
+    .btn-submit.loading .btn-icon {
+        display: none;
+    }
+
+    /* ================================================================
+               SECTION 5: ERROR & SUCCESS MESSAGES
+               ================================================================ */
+    .form-message {
+        border-radius: var(--radius-md);
+        padding: 14px 18px;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        animation: message-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        line-height: 1.5;
+    }
+    .form-message i {
+        font-size: 1.1rem;
+        margin-top: 2px;
+        flex-shrink: 0;
+    }
+    .form-message .msg-content {
+        flex: 1;
+    }
+    .form-message .msg-close {
+        background: none;
+        border: none;
+        color: inherit;
+        opacity: 0.5;
+        cursor: pointer;
+        font-size: 0.9rem;
+        padding: 0 4px;
+        transition: opacity var(--transition-fast);
+        flex-shrink: 0;
+    }
+    .form-message .msg-close:hover {
+        opacity: 1;
+    }
+    @keyframes message-in {
+        0% { opacity: 0; transform: translateY(-10px) scale(0.96); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .form-message.error {
+        background: rgba(255, 0, 68, 0.06);
+        border: 1px solid rgba(255, 0, 68, 0.12);
+        color: #ff0044;
+    }
+    .form-message.error i { color: #ff0044; }
+    
+    .form-message.success {
+        background: rgba(0, 255, 136, 0.06);
+        border: 1px solid rgba(0, 255, 136, 0.12);
+        color: #00ff88;
+    }
+    .form-message.success i { color: #00ff88; }
+    
+    .form-message.warning {
+        background: rgba(255, 230, 0, 0.06);
+        border: 1px solid rgba(255, 230, 0, 0.12);
+        color: #ffe600;
+    }
+    .form-message.warning i { color: #ffe600; }
+    
+    .form-message.info {
+        background: rgba(0, 212, 255, 0.06);
+        border: 1px solid rgba(0, 212, 255, 0.12);
+        color: #00d4ff;
+    }
+    .form-message.info i { color: #00d4ff; }
+
+    /* ================================================================
+               SECTION 6: DIVIDER
+               ================================================================ */
+    .divider-section {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin: 24px 0 20px;
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+    .divider-section::before,
+    .divider-section::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.08), transparent);
+    }
+    .divider-section .divider-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: var(--radius-full);
+        background: rgba(0, 255, 136, 0.10);
+    }
+
+    /* ================================================================
+               SECTION 7: SOCIAL BUTTONS
+               ================================================================ */
+    .social-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+    .social-buttons .btn-social {
+        flex: 1;
+        padding: 11px 16px;
+        border: 1.5px solid rgba(0, 255, 136, 0.06);
+        border-radius: var(--radius-md);
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        font-family: var(--font-sans);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        max-width: 150px;
+        position: relative;
+        overflow: hidden;
+    }
+    .social-buttons .btn-social::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 255, 136, 0.02);
+        opacity: 0;
+        transition: opacity var(--transition-normal);
+    }
+    .social-buttons .btn-social:hover {
+        background: rgba(0, 255, 136, 0.04);
+        border-color: rgba(0, 255, 136, 0.12);
+        transform: translateY(-2px);
+        color: var(--text-primary);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+    .social-buttons .btn-social:hover::before {
+        opacity: 1;
+    }
+    .social-buttons .btn-social:active {
+        transform: scale(0.96);
+    }
+    .social-buttons .btn-social i {
+        font-size: 1.2rem;
+        transition: all var(--transition-fast);
+    }
+    .social-buttons .btn-social.github i { color: #ffffff; }
+    .social-buttons .btn-social.google i { color: #ea4335; }
+    .social-buttons .btn-social.magic i { color: #00d4ff; }
+    .social-buttons .btn-social.discord i { color: #5865F2; }
+    .social-buttons .btn-social:hover i {
+        transform: scale(1.1);
+    }
+    .social-buttons .btn-social .social-label {
+        font-size: 0.8rem;
+    }
+    @media (max-width: 480px) {
+        .social-buttons .btn-social {
+            max-width: none;
+            padding: 10px 12px;
+            font-size: 0.8rem;
+        }
+        .social-buttons .btn-social .social-label {
+            display: none;
+        }
+    }
+
+    /* ================================================================
+               SECTION 8: FOOTER
+               ================================================================ */
+    .login-footer {
+        text-align: center;
+        margin-top: 22px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(0, 255, 136, 0.04);
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+    .login-footer a {
+        color: #00ff88;
+        font-weight: 600;
+        transition: all var(--transition-fast);
+        text-decoration: none;
+        border-bottom: 1.5px solid transparent;
+    }
+    .login-footer a:hover {
+        color: #66ffbb;
+        border-bottom-color: rgba(0, 255, 136, 0.20);
+    }
+    .login-footer .footer-icons {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        margin-top: 10px;
+    }
+    .login-footer .footer-icons a {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        border-bottom: none;
+        transition: all var(--transition-fast);
+        padding: 4px 8px;
+        border-radius: var(--radius-sm);
+    }
+    .login-footer .footer-icons a:hover {
+        color: #00ff88;
+        background: rgba(0, 255, 136, 0.04);
+    }
+
+    /* ================================================================
+               SECTION 9: DEMO CREDENTIALS FLOATING BADGE
+               ================================================================ */
+    .demo-badge {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 18px 10px 14px;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(0, 255, 136, 0.08);
+        border-radius: var(--radius-full);
+        box-shadow: var(--shadow-card), 0 0 30px rgba(0, 255, 136, 0.02);
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        user-select: none;
+    }
+    .demo-badge:hover {
+        transform: translateY(-3px);
+        border-color: rgba(0, 255, 136, 0.15);
+        box-shadow: var(--shadow-card-hover), var(--shadow-glow);
+        color: var(--text-primary);
+    }
+    .demo-badge .demo-key {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 10px;
+        background: rgba(0, 255, 136, 0.06);
+        border-radius: var(--radius-sm);
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: #00ff88;
+        border: 1px solid rgba(0, 255, 136, 0.06);
+    }
+    .demo-badge .demo-icon {
+        font-size: 0.9rem;
+        color: #00ff88;
+    }
+    .demo-badge .demo-arrow {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        transition: transform var(--transition-normal);
+    }
+    .demo-badge:hover .demo-arrow {
+        transform: translateX(4px);
+    }
+
+    /* ================================================================
+               SECTION 10: PASSWORD STRENGTH INDICATOR
+               ================================================================ */
+    .password-strength {
+        margin-top: 10px;
+        height: 4px;
+        border-radius: var(--radius-full);
+        background: rgba(255, 255, 255, 0.03);
+        overflow: hidden;
+        transition: all var(--transition-normal);
+        position: relative;
+    }
+    .password-strength .bar {
+        height: 100%;
+        width: 0%;
+        border-radius: var(--radius-full);
+        transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.5s ease;
+        position: relative;
+    }
+    .password-strength .bar::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+        animation: shimmer 2s ease-in-out infinite;
+    }
+    .password-strength .bar.weak { width: 25%; background: #ff0044; }
+    .password-strength .bar.medium { width: 50%; background: #ffe600; }
+    .password-strength .bar.strong { width: 75%; background: #00d4ff; }
+    .password-strength .bar.perfect { width: 100%; background: #00ff88; box-shadow: 0 0 20px rgba(0, 255, 136, 0.20); }
+
+    .strength-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 6px;
+        font-size: 0.7rem;
+        color: var(--text-muted);
+    }
+    .strength-label .strength-text {
+        font-weight: 600;
+        transition: color var(--transition-fast);
+    }
+    .strength-label .strength-text.weak { color: #ff0044; }
+    .strength-label .strength-text.medium { color: #ffe600; }
+    .strength-label .strength-text.strong { color: #00d4ff; }
+    .strength-label .strength-text.perfect { color: #00ff88; }
+
+    /* ================================================================
+               SECTION 11: RESPONSIVE
+               ================================================================ */
+    @media (max-width: 600px) {
+        .login-card {
+            padding: 32px 24px;
+            border-radius: var(--radius-lg);
+            max-width: 100%;
+            margin: 0 8px;
+        }
+        .login-header .logo-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 26px;
+        }
+        .login-header h1 {
+            font-size: 1.35rem;
+        }
+        .login-header p {
+            font-size: 0.8rem;
+        }
+        .form-group .input-wrapper input {
+            padding: 11px 12px 11px 40px;
+            font-size: 0.9rem;
+        }
+        .form-group .input-wrapper .input-icon {
+            left: 12px;
+            font-size: 0.85rem;
+        }
+        .btn-submit {
+            padding: 13px 16px;
+            font-size: 0.9rem;
+        }
+        .form-options {
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .social-buttons {
+            flex-wrap: wrap;
+        }
+        .social-buttons .btn-social {
+            flex: 1;
+            min-width: 80px;
+        }
+        .demo-badge {
+            bottom: 16px;
+            right: 16px;
+            padding: 8px 14px 8px 12px;
+            font-size: 0.7rem;
+        }
+        .demo-badge .demo-label {
+            display: none;
+        }
+        .particles {
+            display: none;
+        }
+        .login-wrapper::before {
+            display: none;
+        }
+    }
+
+    @media (max-width: 380px) {
+        .login-card {
+            padding: 24px 16px;
+        }
+        .login-header .logo-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 22px;
+        }
+        .login-header h1 {
+            font-size: 1.15rem;
+        }
+        .form-group .input-wrapper input {
+            padding: 10px 10px 10px 36px;
+            font-size: 0.85rem;
+        }
+        .form-group .input-wrapper .input-icon {
+            left: 10px;
+            font-size: 0.8rem;
+        }
+        .btn-submit {
+            padding: 11px 14px;
+            font-size: 0.85rem;
+        }
+        .social-buttons .btn-social {
+            padding: 8px 10px;
+            font-size: 0.75rem;
+        }
+        .demo-badge {
+            bottom: 12px;
+            right: 12px;
+            padding: 6px 10px 6px 8px;
+            font-size: 0.65rem;
+        }
+        .demo-badge .demo-key {
+            display: none;
+        }
+    }
+
+    /* ================================================================
+               SECTION 12: ANIMATIONS
+               ================================================================ */
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-10px); }
+        40% { transform: translateX(10px); }
+        60% { transform: translateX(-6px); }
+        80% { transform: translateX(6px); }
+    }
+    @keyframes glow-pulse-slow {
+        0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.02); }
+        50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.06), 0 0 80px rgba(0, 255, 136, 0.02); }
+    }
+
+    .shake {
+        animation: shake 0.5s ease;
+    }
+    .glow-pulse-slow {
+        animation: glow-pulse-slow 4s ease-in-out infinite;
+    }
+
+    /* ================================================================
+               SECTION 13: LOADING OVERLAY FOR SUBMIT
+               ================================================================ */
+    .loading-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.40);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        border-radius: var(--radius-xl);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        animation: fade-in 0.3s ease;
+    }
+    .loading-overlay.show {
+        display: flex;
+    }
+    .loading-overlay .loader {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+    .loading-overlay .loader .spinner-large {
+        width: 48px;
+        height: 48px;
+        border: 3px solid rgba(0, 255, 136, 0.08);
+        border-top-color: #00ff88;
+        border-radius: var(--radius-full);
+        animation: spin 0.8s linear infinite;
+        box-shadow: 0 0 40px rgba(0, 255, 136, 0.05);
+    }
+    .loading-overlay .loader .load-text {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+    }
+    .loading-overlay .loader .load-text .dots::after {
+        content: '';
+        animation: dots 1.5s steps(4) infinite;
+    }
+    @keyframes dots {
+        0% { content: ''; }
+        25% { content: '.'; }
+        50% { content: '..'; }
+        75% { content: '...'; }
+        100% { content: ''; }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- ================================================================
+LOGIN PAGE BODY
+=============================================================== -->
+
+<div class="login-wrapper">
+    <!-- Floating Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Login Card -->
+    <div class="login-card glow-pulse-slow" id="loginCard">
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loader">
+                <div class="spinner-large"></div>
+                <div class="load-text">Authenticating<span class="dots"></span></div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="login-header">
+            <div class="logo-icon">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <h1>Welcome to SasiVPS</h1>
+            <p>
+                <i class="fas fa-rocket" style="color: #00ff88; font-size: 0.7rem;"></i>
+                Deploy your code in <span class="highlight">seconds</span>
+            </p>
+        </div>
+
+        <!-- ===== FORM MESSAGES ===== -->
+        {% if error %}
+        <div class="form-message error" id="errorMessage">
+            <i class="fas fa-exclamation-circle"></i>
+            <span class="msg-content">{{ error }}</span>
+            <button class="msg-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+        </div>
+        {% endif %}
+        
+        {% if success %}
+        <div class="form-message success">
+            <i class="fas fa-check-circle"></i>
+            <span class="msg-content">{{ success }}</span>
+            <button class="msg-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+        </div>
+        {% endif %}
+
+        <!-- ===== LOGIN FORM ===== -->
+        <form id="loginForm" method="post" action="/login" novalidate>
+            <!-- Username -->
+            <div class="form-group">
+                <label for="loginUsername">
+                    <i class="fas fa-user"></i> Username
+                </label>
+                <div class="input-wrapper">
+                    <span class="input-icon"><i class="fas fa-user"></i></span>
+                    <input 
+                        type="text" 
+                        id="loginUsername" 
+                        name="username" 
+                        placeholder="Enter your username"
+                        value="{{ request.form.get('username', '') }}"
+                        autocomplete="username"
+                        required
+                        autofocus
+                        minlength="2"
+                        maxlength="30"
+                        pattern="[a-zA-Z0-9_]+"
+                        oninput="validateUsername(this)"
+                    >
+                    <span class="input-validation" id="usernameValidation"></span>
+                </div>
+                <span class="form-helper" id="usernameHelper">
+                    <i class="fas fa-info-circle"></i> Letters, numbers, underscores only
+                </span>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label for="loginPassword">
+                    <i class="fas fa-lock"></i> Password
+                </label>
+                <div class="input-wrapper">
+                    <span class="input-icon"><i class="fas fa-lock"></i></span>
+                    <input 
+                        type="password" 
+                        id="loginPassword" 
+                        name="password" 
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                        minlength="4"
+                        oninput="validatePassword(this)"
+                    >
+                    <button type="button" class="toggle-password" onclick="togglePassword('loginPassword', this)" title="Toggle password visibility">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <span class="input-validation" id="passwordValidation"></span>
+                </div>
+                <div class="password-strength" id="passwordStrength">
+                    <div class="bar" id="strengthBar"></div>
+                </div>
+                <div class="strength-label">
+                    <span class="form-helper" style="margin: 0;">
+                        <i class="fas fa-shield-alt"></i> <span id="strengthText">Enter password</span>
+                    </span>
+                    <span class="strength-text" id="strengthLabel"></span>
+                </div>
+            </div>
+
+            <!-- Options -->
+            <div class="form-options">
+                <label>
+                    <input type="checkbox" name="remember" checked id="rememberMe">
+                    <span>Keep me signed in</span>
+                </label>
+                <a href="#" onclick="showToast('🔐 Password reset link sent to your registered email!', 'info')">
+                    <i class="fas fa-key"></i> Forgot password?
+                </a>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn-submit" id="loginBtn">
+                <span class="btn-icon"><i class="fas fa-rocket"></i></span>
+                <span class="btn-text">Login to Dashboard</span>
+                <span class="spinner"></span>
+            </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="divider-section">
+            <span class="divider-dot"></span>
+            <span>or continue with</span>
+            <span class="divider-dot"></span>
+        </div>
+
+        <!-- Social Buttons -->
+        <div class="social-buttons">
+            <button class="btn-social github" onclick="showToast('🔐 GitHub authentication coming soon!', 'info')">
+                <i class="fab fa-github"></i>
+                <span class="social-label">GitHub</span>
+            </button>
+            <button class="btn-social google" onclick="showToast('🔐 Google authentication coming soon!', 'info')">
+                <i class="fab fa-google"></i>
+                <span class="social-label">Google</span>
+            </button>
+            <button class="btn-social discord" onclick="showToast('🔐 Discord authentication coming soon!', 'info')">
+                <i class="fab fa-discord"></i>
+                <span class="social-label">Discord</span>
+            </button>
+            <button class="btn-social magic" onclick="showToast('📧 Magic link sent to your email!', 'success')">
+                <i class="fas fa-envelope"></i>
+                <span class="social-label">Magic</span>
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="login-footer">
+            <div>
+                <i class="fas fa-shield-alt" style="color: #00ff88; font-size: 0.7rem;"></i>
+                Secure login · 256-bit encryption
+            </div>
+            <div class="footer-icons">
+                <a href="#" onclick="showToast('📖 Documentation available at docs.sasivps.com', 'info')">
+                    <i class="fas fa-book"></i>
+                </a>
+                <a href="#" onclick="showToast('💬 Join our Discord community!', 'info')">
+                    <i class="fab fa-discord"></i>
+                </a>
+                <a href="#" onclick="showToast('📧 support@sasivps.com', 'info')">
+                    <i class="fas fa-headset"></i>
+                </a>
+                <a href="#" onclick="showToast('🐛 Report an issue on GitHub', 'info')">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== DEMO CREDENTIALS BADGE ===== -->
+<div class="demo-badge" id="demoBadge" onclick="fillDemoCredentials()" title="Click to fill demo credentials">
+    <span class="demo-icon"><i class="fas fa-key"></i></span>
+    <span class="demo-label">Demo Login</span>
+    <span class="demo-key">sasi / sasi_codex</span>
+    <span class="demo-arrow"><i class="fas fa-arrow-right"></i></span>
+</div>
+
+<!-- ================================================================
+SCRIPTS
+=============================================================== -->
+<script>
+    // ============================================================
+    // SECTION 1: PASSWORD TOGGLE
+    // ============================================================
+    function togglePassword(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        const icon = btn.querySelector('i');
+        if (icon) {
+            icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+        }
+        // Focus stays on input
+        input.focus();
+    }
+
+    // ============================================================
+    // SECTION 2: PASSWORD STRENGTH
+    // ============================================================
+    function checkPasswordStrength(password) {
+        const bar = document.getElementById('strengthBar');
+        const text = document.getElementById('strengthText');
+        const label = document.getElementById('strengthLabel');
+        if (!bar || !text || !label) return;
+
+        let score = 0;
+        let strength = '';
+        let className = '';
+        let color = '';
+
+        // Length check
+        if (password.length >= 4) score += 1;
+        if (password.length >= 8) score += 1;
+        if (password.length >= 12) score += 1;
+        
+        // Character variety
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score += 1;
+        if (/[0-9]/.test(password)) score += 1;
+        if (/[^a-zA-Z0-9]/.test(password)) score += 1;
+
+        // Determine strength
+        if (password.length === 0) {
+            strength = 'Enter password';
+            className = '';
+            color = 'var(--text-muted)';
+        } else if (score <= 2) {
+            strength = 'Weak';
+            className = 'weak';
+            color = '#ff0044';
+        } else if (score <= 3) {
+            strength = 'Medium';
+            className = 'medium';
+            color = '#ffe600';
+        } else if (score <= 4) {
+            strength = 'Strong';
+            className = 'strong';
+            color = '#00d4ff';
+        } else {
+            strength = 'Perfect! 🔒';
+            className = 'perfect';
+            color = '#00ff88';
+        }
+
+        bar.className = 'bar ' + className;
+        text.textContent = strength;
+        label.textContent = strength;
+        label.className = 'strength-text ' + className;
+        
+        // Update label color
+        if (password.length > 0) {
+            label.style.color = color;
+        } else {
+            label.style.color = 'var(--text-muted)';
+            label.textContent = '';
+        }
+    }
+
+    // ============================================================
+    // SECTION 3: REAL-TIME VALIDATION
+    // ============================================================
+    function validateUsername(input) {
+        const validation = document.getElementById('usernameValidation');
+        const helper = document.getElementById('usernameHelper');
+        const value = input.value;
+        const isValid = /^[a-zA-Z0-9_]{2,30}$/.test(value);
+        
+        if (value.length === 0) {
+            validation.className = 'input-validation';
+            validation.textContent = '';
+            helper.className = 'form-helper';
+            helper.innerHTML = '<i class="fas fa-info-circle"></i> Letters, numbers, underscores only';
+            input.classList.remove('input-error', 'input-success');
+            return;
+        }
+        
+        if (isValid) {
+            validation.className = 'input-validation valid';
+            validation.textContent = '✓';
+            input.classList.remove('input-error');
+            input.classList.add('input-success');
+            helper.className = 'form-helper success-text';
+            helper.innerHTML = '<i class="fas fa-check-circle"></i> Username looks good!';
+        } else {
+            validation.className = 'input-validation invalid';
+            validation.textContent = '✗';
+            input.classList.remove('input-success');
+            input.classList.add('input-error');
+            helper.className = 'form-helper error-text';
+            helper.innerHTML = '<i class="fas fa-exclamation-circle"></i> Only letters, numbers, underscores allowed (2-30 chars)';
+        }
+    }
+
+    function validatePassword(input) {
+        const validation = document.getElementById('passwordValidation');
+        const value = input.value;
+        
+        if (value.length === 0) {
+            validation.className = 'input-validation';
+            validation.textContent = '';
+            input.classList.remove('input-error', 'input-success');
+            checkPasswordStrength(value);
+            return;
+        }
+        
+        if (value.length >= 4) {
+            validation.className = 'input-validation valid';
+            validation.textContent = '✓';
+            input.classList.remove('input-error');
+            input.classList.add('input-success');
+        } else {
+            validation.className = 'input-validation invalid';
+            validation.textContent = '✗';
+            input.classList.remove('input-success');
+            input.classList.add('input-error');
+        }
+        
+        checkPasswordStrength(value);
+    }
+
+    // ============================================================
+    // SECTION 4: DEMO CREDENTIALS
+    // ============================================================
+    function fillDemoCredentials() {
+        const username = document.getElementById('loginUsername');
+        const password = document.getElementById('loginPassword');
+        
+        if (username && password) {
+            username.value = 'sasi';
+            password.value = 'sasi_codex';
+            
+            // Trigger validation
+            validateUsername(username);
+            validatePassword(password);
+            
+            // Highlight effect
+            username.style.transition = 'box-shadow 0.3s ease';
+            password.style.transition = 'box-shadow 0.3s ease';
+            username.style.boxShadow = '0 0 30px rgba(0,255,136,0.10)';
+            password.style.boxShadow = '0 0 30px rgba(0,255,136,0.10)';
+            
+            setTimeout(() => {
+                username.style.boxShadow = '';
+                password.style.boxShadow = '';
+            }, 1500);
+            
+            showToast('🔑 Demo credentials filled! Click Login.', 'success');
+            
+            // Auto-focus on password
+            setTimeout(() => password.focus(), 300);
+        }
+    }
+
+    // ============================================================
+    // SECTION 5: FORM SUBMIT HANDLING
+    // ============================================================
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const btn = document.getElementById('loginBtn');
+        const overlay = document.getElementById('loadingOverlay');
+        
+        // Validate form
+        const username = document.getElementById('loginUsername');
+        const password = document.getElementById('loginPassword');
+        
+        if (!username.value.trim() || !password.value.trim()) {
+            e.preventDefault();
+            showToast('⚠️ Please fill in all fields', 'warning');
+            if (!username.value.trim()) username.focus();
+            else password.focus();
+            return;
+        }
+        
+        // Show loading state
+        btn.classList.add('loading');
+        btn.disabled = true;
+        overlay.classList.add('show');
+        
+        // Remove any existing error messages
+        const existingError = document.querySelector('.form-message.error');
+        if (existingError) existingError.remove();
+        
+        // Form will submit naturally
+    });
+
+    // ============================================================
+    // SECTION 6: KEYBOARD SHORTCUTS
+    // ============================================================
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+Shift+D = fill demo credentials
+        if (e.ctrlKey && e.shiftKey && (e.key === 'd' || e.key === 'D')) {
+            e.preventDefault();
+            fillDemoCredentials();
+        }
+        
+        // Escape = close any open messages
+        if (e.key === 'Escape') {
+            const messages = document.querySelectorAll('.form-message');
+            messages.forEach(msg => msg.remove());
+        }
+        
+        // Enter on any input triggers submit
+        if (e.key === 'Enter') {
+            const active = document.activeElement;
+            if (active && active.closest('.form-group')) {
+                e.preventDefault();
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        }
+    });
+
+    // ============================================================
+    // SECTION 7: ENTER KEY HANDLING FOR BOTH FIELDS
+    // ============================================================
+    document.querySelectorAll('#loginForm input').forEach(input => {
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+    });
+
+    // ============================================================
+    // SECTION 8: AUTO-FOCUS ON LOAD
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const username = document.getElementById('loginUsername');
+        if (username) {
+            setTimeout(() => username.focus(), 400);
+        }
+        
+        // Check for error and shake card
+        const errorMsg = document.querySelector('.form-message.error');
+        if (errorMsg) {
+            const card = document.getElementById('loginCard');
+            card.classList.add('shake');
+            setTimeout(() => card.classList.remove('shake'), 600);
+        }
+        
+        // If there's a flash message in session
+        const flashMsg = sessionStorage.getItem('flash');
+        if (flashMsg) {
+            try {
+                const data = JSON.parse(flashMsg);
+                showToast(data.message, data.type || 'info');
+            } catch(e) {}
+            sessionStorage.removeItem('flash');
+        }
+    });
+
+    // ============================================================
+    // SECTION 9: REMEMBER ME VISUAL FEEDBACK
+    // ============================================================
+    document.getElementById('rememberMe')?.addEventListener('change', function() {
+        const label = this.closest('label');
+        if (this.checked) {
+            label.style.color = 'var(--text-secondary)';
+        } else {
+            label.style.color = 'var(--text-muted)';
+        }
+    });
+
+    // ============================================================
+    // SECTION 10: SHOW TOAST OVERRIDE FOR DEMO
+    // ============================================================
+    // Keep base toast, but add demo-specific ones
+    const originalShowToast = window.showToast;
+    if (originalShowToast) {
+        window.showToast = function(message, type = 'info', duration = 4000) {
+            originalShowToast(message, type, duration);
+        };
+    }
+
+    // ============================================================
+    // SECTION 11: CONSOLE WELCOME
+    // ============================================================
+    console.log('%c🔐 SasiVPS Login', 'font-size: 20px; font-weight: 800; color: #00ff88; text-shadow: 0 0 20px rgba(0,255,136,0.2);');
+    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #444444;');
+    console.log('%c  📝 Demo Credentials:', 'font-size: 13px; font-weight: 600; color: #8892bf;');
+    console.log('%c     Username: sasi', 'font-size: 13px; color: #00ff88;');
+    console.log('%c     Password: sasi_codex', 'font-size: 13px; color: #00ff88;');
+    console.log('%c  ⌨️  Shortcut: Ctrl+Shift+D to auto-fill', 'font-size: 12px; color: #5a6a8a;');
+    console.log('%c  🖱️  Or click the floating button', 'font-size: 12px; color: #5a6a8a;');
+    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #444444;');
+    console.log('%c🚀 Ready to deploy!', 'font-size: 14px; font-weight: 600; color: #00d4ff;');
+
+    // ============================================================
+    // SECTION 12: NETWORK STATUS INDICATOR
+    // ============================================================
+    window.addEventListener('online', () => {
+        showToast('🟢 Back online!', 'success');
+    });
+
+    window.addEventListener('offline', () => {
+        showToast('🔴 You are offline. Check your connection.', 'error');
+    });
+
+    // ============================================================
+    // SECTION 13: PREVENT DOUBLE SUBMIT
+    // ============================================================
+    let isSubmitting = false;
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        if (isSubmitting) {
+            e.preventDefault();
+            return;
+        }
+        isSubmitting = true;
+        // Re-enable after 5 seconds max
+        setTimeout(() => { isSubmitting = false; }, 5000);
+    });
+</script>
+{% endblock %}

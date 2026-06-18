@@ -1,0 +1,1485 @@
+{% extends "base.html" %}
+{% block title %}Owner Dashboard — SasiVPS{% endblock %}
+
+{% block head %}
+<style>
+    /* ================================================================
+               OWNER DASHBOARD SPECIFIC STYLES — NEON THEME
+               ================================================================ */
+    
+    /* ----- Dashboard Container ----- */
+    .owner-wrapper {
+        padding: 24px 0 40px;
+        position: relative;
+    }
+    
+    /* Animated background glow */
+    .owner-wrapper::before {
+        content: '';
+        position: fixed;
+        top: -30%;
+        right: -20%;
+        width: 60%;
+        height: 60%;
+        background: radial-gradient(ellipse, rgba(0, 255, 136, 0.03) 0%, transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+        animation: owner-glow 10s ease-in-out infinite alternate;
+    }
+    .owner-wrapper::after {
+        content: '';
+        position: fixed;
+        bottom: -30%;
+        left: -20%;
+        width: 60%;
+        height: 60%;
+        background: radial-gradient(ellipse, rgba(0, 212, 255, 0.02) 0%, transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+        animation: owner-glow 12s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes owner-glow {
+        0% { opacity: 0.5; transform: scale(1) rotate(0deg); }
+        100% { opacity: 1; transform: scale(1.1) rotate(3deg); }
+    }
+
+    /* ----- Header Section ----- */
+    .owner-header {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 28px;
+        padding: 24px 28px;
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 255, 136, 0.06);
+        border-radius: var(--radius-lg);
+        backdrop-filter: blur(16px);
+        box-shadow: var(--shadow-card), var(--shadow-glow);
+        animation: slide-down 0.5s ease-out;
+    }
+    @keyframes slide-down {
+        0% { opacity: 0; transform: translateY(-20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .owner-header .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .owner-header .header-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-md);
+        background: var(--gradient-main);
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        color: #000000;
+        box-shadow: 0 0 40px rgba(0, 255, 136, 0.12);
+        animation: logo-pulse 3s ease-in-out infinite;
+    }
+    @keyframes logo-pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.04); }
+    }
+    .owner-header .header-title h1 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0;
+        background: var(--gradient-main);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    .owner-header .header-title p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin: 0;
+    }
+    .owner-header .header-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .owner-header .header-right .time-display {
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        background: rgba(0, 0, 0, 0.20);
+        padding: 6px 14px;
+        border-radius: var(--radius-full);
+        border: 1px solid rgba(0, 255, 136, 0.06);
+    }
+
+    /* ----- Stats Grid ----- */
+    .stats-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+    .stat-card {
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 255, 136, 0.05);
+        border-radius: var(--radius-lg);
+        padding: 20px 22px;
+        transition: all var(--transition-normal);
+        position: relative;
+        overflow: hidden;
+        animation: scale-in 0.5s ease-out forwards;
+        opacity: 0;
+    }
+    .stat-card:nth-child(1) { animation-delay: 0.05s; }
+    .stat-card:nth-child(2) { animation-delay: 0.10s; }
+    .stat-card:nth-child(3) { animation-delay: 0.15s; }
+    .stat-card:nth-child(4) { animation-delay: 0.20s; }
+    .stat-card:nth-child(5) { animation-delay: 0.25s; }
+    @keyframes scale-in {
+        0% { opacity: 0; transform: scale(0.92); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+    .stat-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(0, 255, 136, 0.12);
+        box-shadow: var(--shadow-card-hover), var(--shadow-glow);
+    }
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--gradient-main);
+        opacity: 0;
+        transition: opacity var(--transition-normal);
+    }
+    .stat-card:hover::before {
+        opacity: 1;
+    }
+    .stat-card .stat-number {
+        font-size: 2rem;
+        font-weight: 900;
+        font-family: var(--font-mono);
+        color: #00ff88;
+        text-shadow: 0 0 30px rgba(0, 255, 136, 0.10);
+        line-height: 1.2;
+    }
+    .stat-card .stat-number .trend {
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+    .stat-card .stat-number .trend.up { color: #00ff88; }
+    .stat-card .stat-number .trend.down { color: #ff0044; }
+    .stat-card .stat-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 4px;
+    }
+    .stat-card .stat-icon {
+        position: absolute;
+        right: 16px;
+        top: 16px;
+        font-size: 1.5rem;
+        color: rgba(0, 255, 136, 0.06);
+        transition: all var(--transition-normal);
+    }
+    .stat-card:hover .stat-icon {
+        color: rgba(0, 255, 136, 0.12);
+        transform: scale(1.1) rotate(5deg);
+    }
+    .stat-card .stat-progress {
+        margin-top: 10px;
+        height: 3px;
+        border-radius: var(--radius-full);
+        background: rgba(255, 255, 255, 0.03);
+        overflow: hidden;
+    }
+    .stat-card .stat-progress .bar {
+        height: 100%;
+        border-radius: var(--radius-full);
+        background: var(--gradient-main);
+        transition: width 1s ease;
+        width: 0%;
+    }
+
+    /* ----- Section Title ----- */
+    .section-title {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 18px;
+        margin-top: 10px;
+    }
+    .section-title h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .section-title h2 .badge {
+        font-size: 0.6rem;
+        padding: 2px 10px;
+    }
+    .section-title .section-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    /* ----- Create User Card ----- */
+    .create-user-card {
+        position: relative;
+        z-index: 1;
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 255, 136, 0.06);
+        border-radius: var(--radius-lg);
+        padding: 24px 28px;
+        margin-bottom: 24px;
+        transition: all var(--transition-normal);
+        animation: slide-up 0.5s ease-out 0.1s both;
+    }
+    @keyframes slide-up {
+        0% { opacity: 0; transform: translateY(16px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .create-user-card:hover {
+        border-color: rgba(0, 255, 136, 0.10);
+        box-shadow: var(--shadow-card-hover), var(--shadow-glow);
+    }
+    .create-user-card .card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+    .create-user-card .card-header i {
+        font-size: 1.2rem;
+        color: #00ff88;
+    }
+    .create-user-card .card-header h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    .create-user-card .card-header .badge {
+        margin-left: 8px;
+        font-size: 0.55rem;
+        padding: 2px 10px;
+    }
+    .create-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 14px;
+        align-items: end;
+    }
+    .create-form .form-group {
+        margin-bottom: 0;
+    }
+    .create-form .form-group label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+    }
+    .create-form .form-group input {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+    }
+    .create-form .form-group .input-wrapper {
+        position: relative;
+    }
+    .create-form .form-group .input-wrapper .input-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 0.8rem;
+    }
+    .create-form .form-group .input-wrapper input {
+        padding-left: 36px;
+    }
+    .create-form .btn-submit {
+        padding: 10px 24px;
+        font-size: 0.9rem;
+        border-radius: var(--radius-md);
+        background: var(--gradient-main);
+        color: #000000;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        font-family: var(--font-sans);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 0 30px rgba(0, 255, 136, 0.06);
+        height: 44px;
+    }
+    .create-form .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 50px rgba(0, 255, 136, 0.12);
+    }
+    .create-form .btn-submit:active {
+        transform: scale(0.97);
+    }
+
+    /* ----- Users Table Card ----- */
+    .users-table-card {
+        position: relative;
+        z-index: 1;
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 255, 136, 0.06);
+        border-radius: var(--radius-lg);
+        padding: 0;
+        overflow: hidden;
+        margin-bottom: 24px;
+        animation: slide-up 0.5s ease-out 0.2s both;
+        transition: all var(--transition-normal);
+    }
+    .users-table-card:hover {
+        border-color: rgba(0, 255, 136, 0.08);
+        box-shadow: var(--shadow-card-hover);
+    }
+    .users-table-card .table-header {
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        border-bottom: 1px solid rgba(0, 255, 136, 0.04);
+        background: rgba(0, 0, 0, 0.15);
+    }
+    .users-table-card .table-header .search-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--bg-input);
+        border: 1px solid rgba(0, 255, 136, 0.06);
+        border-radius: var(--radius-md);
+        padding: 0 12px;
+        transition: all var(--transition-fast);
+    }
+    .users-table-card .table-header .search-box:focus-within {
+        border-color: rgba(0, 255, 136, 0.15);
+        box-shadow: var(--shadow-focus);
+    }
+    .users-table-card .table-header .search-box i {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+    .users-table-card .table-header .search-box input {
+        background: transparent;
+        border: none;
+        padding: 8px 4px;
+        font-size: 0.85rem;
+        color: var(--text-primary);
+        width: 180px;
+        outline: none;
+        min-width: 120px;
+    }
+    .users-table-card .table-header .search-box input::placeholder {
+        color: var(--text-dimmed);
+    }
+    .users-table-card .table-header .table-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    .users-table-card .table-header .table-actions .btn {
+        font-size: 0.75rem;
+        padding: 6px 14px;
+    }
+
+    /* ----- Table Styling ----- */
+    .table-wrapper {
+        overflow-x: auto;
+        padding: 0;
+    }
+    .table-wrapper table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+    }
+    .table-wrapper table thead {
+        background: rgba(0, 0, 0, 0.20);
+    }
+    .table-wrapper table thead th {
+        padding: 12px 18px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+        border-bottom: 1px solid rgba(0, 255, 136, 0.04);
+        white-space: nowrap;
+        position: sticky;
+        top: 0;
+        background: var(--bg-card);
+        z-index: 2;
+        backdrop-filter: blur(8px);
+    }
+    .table-wrapper table tbody tr {
+        transition: all var(--transition-fast);
+        border-bottom: 1px solid rgba(0, 255, 136, 0.03);
+    }
+    .table-wrapper table tbody tr:last-child {
+        border-bottom: none;
+    }
+    .table-wrapper table tbody tr:hover {
+        background: rgba(0, 255, 136, 0.02);
+    }
+    .table-wrapper table tbody td {
+        padding: 12px 18px;
+        color: var(--text-secondary);
+        vertical-align: middle;
+    }
+    .table-wrapper table tbody td .user-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-full);
+        background: var(--gradient-main);
+        color: #000000;
+        font-weight: 700;
+        font-size: 0.75rem;
+        margin-right: 10px;
+    }
+    .table-wrapper table tbody td .user-name {
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    .table-wrapper table tbody td .user-password {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        background: rgba(0, 0, 0, 0.20);
+        padding: 2px 10px;
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(0, 255, 136, 0.04);
+    }
+    .table-wrapper table tbody td .link-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.7rem;
+    }
+    .table-wrapper table tbody td .link-wrapper a {
+        color: var(--text-muted);
+        transition: color var(--transition-fast);
+        max-width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
+    }
+    .table-wrapper table tbody td .link-wrapper a:hover {
+        color: #00ff88;
+    }
+    .table-wrapper table tbody td .link-wrapper .copy-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 2px 6px;
+        border-radius: var(--radius-sm);
+        transition: all var(--transition-fast);
+        font-size: 0.7rem;
+    }
+    .table-wrapper table tbody td .link-wrapper .copy-btn:hover {
+        color: #00ff88;
+        background: rgba(0, 255, 136, 0.04);
+    }
+    .table-wrapper table tbody td .actions-group {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+    .table-wrapper table tbody td .actions-group .btn {
+        padding: 4px 10px;
+        font-size: 0.7rem;
+        border-radius: var(--radius-sm);
+    }
+    .table-wrapper table tbody td .actions-group .btn-extend {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(0, 255, 136, 0.06);
+        border: 1px solid rgba(0, 255, 136, 0.06);
+        color: #00ff88;
+        padding: 4px 10px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-size: 0.7rem;
+        font-weight: 600;
+        transition: all var(--transition-fast);
+        font-family: var(--font-sans);
+    }
+    .table-wrapper table tbody td .actions-group .btn-extend:hover {
+        background: rgba(0, 255, 136, 0.10);
+        border-color: rgba(0, 255, 136, 0.12);
+        transform: translateY(-1px);
+    }
+    .table-wrapper table tbody td .actions-group .btn-extend input {
+        width: 50px;
+        padding: 2px 4px;
+        font-size: 0.65rem;
+        background: transparent;
+        border: 1px solid rgba(0, 255, 136, 0.06);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        text-align: center;
+    }
+    .table-wrapper table tbody td .actions-group .btn-extend input:focus {
+        border-color: rgba(0, 255, 136, 0.15);
+        outline: none;
+    }
+    .table-wrapper table tbody td .actions-group .btn-delete {
+        background: rgba(255, 0, 68, 0.06);
+        border: 1px solid rgba(255, 0, 68, 0.06);
+        color: #ff0044;
+        padding: 4px 10px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-size: 0.7rem;
+        font-weight: 600;
+        transition: all var(--transition-fast);
+        font-family: var(--font-sans);
+    }
+    .table-wrapper table tbody td .actions-group .btn-delete:hover {
+        background: rgba(255, 0, 68, 0.10);
+        border-color: rgba(255, 0, 68, 0.12);
+        transform: translateY(-1px);
+    }
+
+    /* ----- Empty State ----- */
+    .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: var(--text-muted);
+    }
+    .empty-state .empty-icon {
+        font-size: 3rem;
+        color: rgba(0, 255, 136, 0.06);
+        margin-bottom: 12px;
+    }
+    .empty-state h3 {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+    }
+    .empty-state p {
+        font-size: 0.85rem;
+    }
+
+    /* ----- Pricing Editor Card ----- */
+    .pricing-editor-card {
+        position: relative;
+        z-index: 1;
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 255, 136, 0.06);
+        border-radius: var(--radius-lg);
+        padding: 24px 28px;
+        margin-bottom: 24px;
+        animation: slide-up 0.5s ease-out 0.3s both;
+        transition: all var(--transition-normal);
+    }
+    .pricing-editor-card:hover {
+        border-color: rgba(0, 255, 136, 0.08);
+        box-shadow: var(--shadow-card-hover);
+    }
+    .pricing-editor-card .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+    .pricing-editor-card .card-header h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .pricing-editor-card .card-header h3 i {
+        color: #ffe600;
+    }
+    .pricing-editor-card .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+    .pricing-editor-card .form-row .form-group {
+        margin-bottom: 0;
+    }
+    .pricing-editor-card .form-row .form-group label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+    }
+    .pricing-editor-card .form-row .form-group input {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+    }
+    .pricing-plan-item {
+        display: grid;
+        grid-template-columns: 1fr 1fr 0.7fr 1.5fr auto;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 14px;
+        background: rgba(0, 0, 0, 0.15);
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(0, 255, 136, 0.04);
+        margin-bottom: 8px;
+        transition: all var(--transition-fast);
+    }
+    .pricing-plan-item:hover {
+        border-color: rgba(0, 255, 136, 0.08);
+        background: rgba(0, 0, 0, 0.20);
+    }
+    .pricing-plan-item input {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+        background: var(--bg-input);
+        border: 1px solid rgba(0, 255, 136, 0.04);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        font-family: var(--font-sans);
+    }
+    .pricing-plan-item input:focus {
+        border-color: rgba(0, 255, 136, 0.12);
+        outline: none;
+        box-shadow: var(--shadow-focus);
+    }
+    .pricing-plan-item .remove-plan {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 4px 8px;
+        border-radius: var(--radius-sm);
+        transition: all var(--transition-fast);
+    }
+    .pricing-plan-item .remove-plan:hover {
+        color: #ff0044;
+        background: rgba(255, 0, 68, 0.06);
+    }
+    .pricing-editor-card .pricing-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(0, 255, 136, 0.04);
+    }
+
+    /* ================================================================
+               RESPONSIVE
+               ================================================================ */
+    @media (max-width: 1024px) {
+        .pricing-plan-item {
+            grid-template-columns: 1fr 1fr 0.7fr;
+        }
+        .pricing-plan-item input:nth-child(4) {
+            grid-column: span 3;
+        }
+        .pricing-editor-card .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .owner-header {
+            padding: 18px 20px;
+            flex-direction: column;
+            align-items: stretch;
+            text-align: center;
+        }
+        .owner-header .header-left {
+            justify-content: center;
+        }
+        .owner-header .header-right {
+            justify-content: center;
+        }
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .create-form {
+            grid-template-columns: 1fr;
+        }
+        .create-form .btn-submit {
+            width: 100%;
+            justify-content: center;
+        }
+        .users-table-card .table-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .users-table-card .table-header .search-box input {
+            width: 100%;
+        }
+        .table-wrapper table {
+            font-size: 0.75rem;
+        }
+        .table-wrapper table thead th,
+        .table-wrapper table tbody td {
+            padding: 8px 10px;
+        }
+        .table-wrapper table tbody td .link-wrapper a {
+            max-width: 80px;
+        }
+        .pricing-plan-item {
+            grid-template-columns: 1fr 1fr;
+        }
+        .pricing-plan-item input:nth-child(3) {
+            grid-column: span 1;
+        }
+        .pricing-plan-item input:nth-child(4) {
+            grid-column: span 2;
+        }
+        .pricing-plan-item .remove-plan {
+            grid-column: span 2;
+            justify-self: end;
+        }
+        .owner-wrapper::before,
+        .owner-wrapper::after {
+            display: none;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .owner-header {
+            padding: 14px 16px;
+        }
+        .owner-header .header-icon {
+            width: 44px;
+            height: 44px;
+            font-size: 18px;
+        }
+        .owner-header .header-title h1 {
+            font-size: 1.2rem;
+        }
+        .stats-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .stat-card {
+            padding: 14px 16px;
+        }
+        .stat-card .stat-number {
+            font-size: 1.4rem;
+        }
+        .create-user-card {
+            padding: 18px 16px;
+        }
+        .pricing-editor-card {
+            padding: 18px 16px;
+        }
+        .table-wrapper table {
+            font-size: 0.7rem;
+        }
+        .table-wrapper table thead th,
+        .table-wrapper table tbody td {
+            padding: 6px 8px;
+        }
+        .table-wrapper table tbody td .user-avatar {
+            width: 24px;
+            height: 24px;
+            font-size: 0.6rem;
+            margin-right: 4px;
+        }
+        .table-wrapper table tbody td .user-password {
+            font-size: 0.6rem;
+            padding: 1px 6px;
+        }
+        .table-wrapper table tbody td .actions-group .btn {
+            font-size: 0.6rem;
+            padding: 2px 6px;
+        }
+        .table-wrapper table tbody td .actions-group .btn-extend input {
+            width: 36px;
+            font-size: 0.55rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- ================================================================
+OWNER DASHBOARD BODY
+=============================================================== -->
+
+<div class="owner-wrapper">
+    <div class="container">
+        <!-- ===== HEADER ===== -->
+        <header class="owner-header">
+            <div class="header-left">
+                <div class="header-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="header-title">
+                    <h1>Owner Console</h1>
+                    <p>
+                        <i class="fas fa-shield-alt" style="color: #00ff88; font-size: 0.7rem;"></i>
+                        Manage users, plans &amp; pricing
+                    </p>
+                </div>
+            </div>
+            <div class="header-right">
+                <span class="time-display" id="liveTime">
+                    <i class="fas fa-clock"></i> 
+                    <span id="timeText">Loading...</span>
+                </span>
+                <a href="/logout" class="btn btn-danger btn-sm">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </header>
+
+        <!-- ===== STATS GRID ===== -->
+        <section class="stats-grid">
+            {% set active_users = users.values()|selectattr('expires_at', 'gt', now)|list|length %}
+            {% set expired_users = users.values()|selectattr('expires_at', 'lt', now)|list|length %}
+            {% set total_users = users|length %}
+            {% set permanent_users = users.values()|selectattr('expires_at', 'eq', 0)|list|length %}
+            
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-number">{{ total_users }}</div>
+                <div class="stat-label">Total Users</div>
+                <div class="stat-progress">
+                    <div class="bar" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-circle" style="color: #00ff88;"></i></div>
+                <div class="stat-number">
+                    {{ active_users }}
+                    <span class="trend up"><i class="fas fa-arrow-up"></i></span>
+                </div>
+                <div class="stat-label">Active Users</div>
+                <div class="stat-progress">
+                    <div class="bar" style="width: {{ (active_users / total_users * 100) if total_users > 0 else 0 }}%;"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-circle" style="color: #ff0044;"></i></div>
+                <div class="stat-number">
+                    {{ expired_users }}
+                    <span class="trend down"><i class="fas fa-arrow-down"></i></span>
+                </div>
+                <div class="stat-label">Expired</div>
+                <div class="stat-progress">
+                    <div class="bar" style="width: {{ (expired_users / total_users * 100) if total_users > 0 else 0 }}%; background: var(--gradient-danger);"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-infinity" style="color: #ffe600;"></i></div>
+                <div class="stat-number">{{ permanent_users }}</div>
+                <div class="stat-label">Permanent</div>
+                <div class="stat-progress">
+                    <div class="bar" style="width: {{ (permanent_users / total_users * 100) if total_users > 0 else 0 }}%; background: var(--gradient-gold);"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-link" style="color: #00d4ff;"></i></div>
+                <div class="stat-number">{{ total_users }}</div>
+                <div class="stat-label">Total Links</div>
+                <div class="stat-progress">
+                    <div class="bar" style="width: 100%; background: var(--gradient-cyan);"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== CREATE USER ===== -->
+        <div class="create-user-card">
+            <div class="card-header">
+                <i class="fas fa-user-plus"></i>
+                <h3>Create New User</h3>
+                <span class="badge badge-gradient">+ Add</span>
+            </div>
+            <form method="post" action="/owner/create" class="create-form">
+                <div class="form-group">
+                    <label for="createUsername"><i class="fas fa-user"></i> Username</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-user"></i></span>
+                        <input 
+                            type="text" 
+                            id="createUsername" 
+                            name="username" 
+                            placeholder="Enter username"
+                            required
+                            minlength="2"
+                            maxlength="30"
+                            pattern="[a-zA-Z0-9_]+"
+                            autocomplete="off"
+                        >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="createPassword"><i class="fas fa-lock"></i> Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                        <input 
+                            type="password" 
+                            id="createPassword" 
+                            name="password" 
+                            placeholder="Enter password"
+                            required
+                            minlength="4"
+                            autocomplete="new-password"
+                        >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="createHours"><i class="fas fa-clock"></i> Hours</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-clock"></i></span>
+                        <input 
+                            type="number" 
+                            id="createHours" 
+                            name="hours" 
+                            placeholder="24"
+                            value="24"
+                            min="0"
+                            max="8760"
+                            step="0.5"
+                            required
+                        >
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit" id="createUserBtn">
+                    <i class="fas fa-plus-circle"></i> Create User
+                </button>
+            </form>
+        </div>
+
+        <!-- ===== USERS TABLE ===== -->
+        <div class="users-table-card">
+            <div class="table-header">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input 
+                        type="text" 
+                        id="searchUsers" 
+                        placeholder="Search users..." 
+                        oninput="filterUsers(this.value)"
+                    >
+                    <span class="badge badge-primary" id="userCount">{{ total_users }}</span>
+                </div>
+                <div class="table-actions">
+                    <button class="btn btn-ghost btn-sm" onclick="exportUsers()">
+                        <i class="fas fa-file-export"></i> Export
+                    </button>
+                    <button class="btn btn-ghost btn-sm" onclick="refreshTable()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="userTable">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Password</th>
+                            <th>Status</th>
+                            <th>Auto-Login Link</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if users %}
+                            {% for name, u in users.items() %}
+                            {% set remain = (u.expires_at - now) if u.expires_at else 0 %}
+                            <tr data-username="{{ name|lower }}" data-active="{% if u.expires_at and remain > 0 %}true{% elif not u.expires_at %}true{% else %}false{% endif %}">
+                                <td>
+                                    <span class="user-avatar">{{ name[0]|upper }}</span>
+                                    <span class="user-name">{{ name }}</span>
+                                </td>
+                                <td>
+                                    <span class="user-password">{{ u.password }}</span>
+                                </td>
+                                <td>
+                                    {% if u.expires_at %}
+                                        {% if remain > 0 %}
+                                            <span class="badge badge-success badge-pulse">
+                                                <i class="fas fa-circle" style="font-size: 6px;"></i>
+                                                {{ (remain/3600)|round(1) }}h left
+                                            </span>
+                                        {% else %}
+                                            <span class="badge badge-danger">
+                                                <i class="fas fa-exclamation-circle"></i> Expired
+                                            </span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge badge-warning">
+                                            <i class="fas fa-infinity"></i> Permanent
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="link-wrapper">
+                                        <a href="{{ base_url }}/auto/{{ u.token }}" target="_blank" title="{{ base_url }}/auto/{{ u.token }}">
+                                            <i class="fas fa-link"></i> {{ base_url }}/auto/{{ u.token[:20] }}...
+                                        </a>
+                                        <button class="copy-btn" onclick="copyLink('{{ base_url }}/auto/{{ u.token }}')" title="Copy link">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="actions-group">
+                                        <form class="inline" method="post" action="/owner/extend/{{ name }}" onsubmit="return confirm('Extend {{ name }} by ' + this.querySelector('input').value + ' hours?')">
+                                            <span class="btn-extend">
+                                                <input type="number" name="hours" value="24" min="0.5" max="8760" step="0.5">
+                                                <button type="submit" class="btn btn-ok btn-sm" style="background: none; border: none; color: #00ff88; cursor: pointer; padding: 0 4px;">
+                                                    <i class="fas fa-plus-circle"></i> Extend
+                                                </button>
+                                            </span>
+                                        </form>
+                                        <form class="inline" method="post" action="/owner/delete/{{ name }}" onsubmit="return confirm('⚠️ Delete user {{ name }} permanently? This cannot be undone!')">
+                                            <button type="submit" class="btn-delete">
+                                                <i class="fas fa-trash-alt"></i> Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+                {% if not users %}
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-users-slash"></i></div>
+                    <h3>No Users Yet</h3>
+                    <p>Create your first user using the form above.</p>
+                </div>
+                {% endif %}
+            </div>
+            <div style="padding: 12px 24px; border-top: 1px solid rgba(0, 255, 136, 0.04); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.75rem; color: var(--text-muted);">
+                <span>
+                    <i class="fas fa-database"></i> 
+                    <span id="rowCount">{{ total_users }}</span> users
+                    <span class="badge badge-success" style="margin-left: 8px;">{{ active_users }} active</span>
+                    <span class="badge badge-danger">{{ expired_users }} expired</span>
+                </span>
+                <span>
+                    <i class="fas fa-link"></i> Auto-login links expire with user accounts
+                </span>
+            </div>
+        </div>
+
+        <!-- ===== PRICING EDITOR ===== -->
+        <div class="pricing-editor-card" id="pricing">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-edit"></i> Pricing Plans Editor
+                    <span class="badge badge-primary">Live</span>
+                </h3>
+                <span class="muted" style="font-size: 0.75rem;">
+                    <i class="fas fa-info-circle"></i> Changes appear on Home &amp; Pricing pages
+                </span>
+            </div>
+            <form method="post" action="/owner/pricing">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pricingCurrency"><i class="fas fa-dollar-sign"></i> Currency Symbol</label>
+                        <input type="text" id="pricingCurrency" name="currency" value="{{ pricing.currency }}" placeholder="$" maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <label for="pricingContact"><i class="fas fa-headset"></i> Contact Info</label>
+                        <input type="text" id="pricingContact" name="contact" value="{{ pricing.contact }}" placeholder="Telegram: @sasi_vps">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; display: block;">
+                        <i class="fas fa-cubes"></i> Plans
+                    </label>
+                    <div id="plansContainer">
+                        {% for p in pricing.plans %}
+                        <div class="pricing-plan-item">
+                            <input type="text" name="p_name" value="{{ p.name }}" placeholder="Plan Name">
+                            <input type="text" name="p_duration" value="{{ p.duration }}" placeholder="Duration">
+                            <input type="text" name="p_price" value="{{ p.price }}" placeholder="Price">
+                            <input type="text" name="p_features" value="{{ p.features }}" placeholder="Features (comma separated)">
+                            <button type="button" class="remove-plan" onclick="removePlan(this)" title="Remove plan">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="pricing-actions">
+                    <button type="button" class="btn btn-ghost btn-sm" onclick="addPlan()">
+                        <i class="fas fa-plus-circle"></i> Add Plan
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-sm" id="savePricingBtn">
+                        <i class="fas fa-save"></i> Save Pricing
+                    </button>
+                    <button type="button" class="btn btn-ghost btn-sm" onclick="resetPricing()">
+                        <i class="fas fa-undo"></i> Reset Defaults
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<!-- ================================================================
+SCRIPTS
+=============================================================== -->
+<script>
+    // ============================================================
+    // SECTION 1: LIVE CLOCK
+    // ============================================================
+    function updateClock() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit',
+            hour12: true 
+        });
+        const dateStr = now.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+        const el = document.getElementById('timeText');
+        if (el) el.textContent = dateStr + ' ' + timeStr;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ============================================================
+    // SECTION 2: USER SEARCH / FILTER
+    // ============================================================
+    function filterUsers(query) {
+        const rows = document.querySelectorAll('#userTable tbody tr');
+        const q = query.toLowerCase().trim();
+        let visible = 0;
+        rows.forEach(row => {
+            const name = row.dataset.username || '';
+            const match = name.includes(q);
+            row.style.display = match ? '' : 'none';
+            if (match) visible++;
+        });
+        const countEl = document.getElementById('userCount');
+        if (countEl) countEl.textContent = visible;
+        const rowCountEl = document.getElementById('rowCount');
+        if (rowCountEl) rowCountEl.textContent = visible;
+    }
+
+    // ============================================================
+    // SECTION 3: COPY LINK
+    // ============================================================
+    function copyLink(url) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url)
+                .then(() => showToast('📋 Link copied to clipboard!', 'success'))
+                .catch(() => fallbackCopy(url));
+        } else {
+            fallbackCopy(url);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const input = document.createElement('input');
+        input.value = text;
+        document.body.appendChild(input);
+        input.select();
+        try {
+            document.execCommand('copy');
+            showToast('📋 Link copied to clipboard!', 'success');
+        } catch (e) {
+            showToast('Failed to copy', 'error');
+        }
+        input.remove();
+    }
+
+    // ============================================================
+    // SECTION 4: EXPORT USERS
+    // ============================================================
+    function exportUsers() {
+        const rows = document.querySelectorAll('#userTable tbody tr');
+        if (rows.length === 0) {
+            showToast('No users to export', 'warning');
+            return;
+        }
+        
+        let csv = 'Username,Password,Status,Expires\n';
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length < 3) return;
+            const name = cells[0].querySelector('.user-name')?.textContent || '';
+            const pass = cells[1].querySelector('.user-password')?.textContent || '';
+            const status = cells[2].textContent.trim();
+            csv += `${name},${pass},"${status}"\n`;
+        });
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `users_${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('📊 Users exported successfully!', 'success');
+    }
+
+    // ============================================================
+    // SECTION 5: REFRESH TABLE
+    // ============================================================
+    function refreshTable() {
+        showToast('🔄 Refreshing...', 'info');
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
+    }
+
+    // ============================================================
+    // SECTION 6: PRICING EDITOR
+    // ============================================================
+    let planCounter = {{ pricing.plans|length }};
+
+    function addPlan() {
+        const container = document.getElementById('plansContainer');
+        const div = document.createElement('div');
+        div.className = 'pricing-plan-item';
+        div.style.animation = 'scale-in 0.3s ease-out';
+        div.innerHTML = `
+            <input type="text" name="p_name" placeholder="Plan Name" value="Plan ${planCounter + 1}">
+            <input type="text" name="p_duration" placeholder="Duration" value="30 Days">
+            <input type="text" name="p_price" placeholder="Price" value="99">
+            <input type="text" name="p_features" placeholder="Features (comma separated)" value="Feature 1, Feature 2, Feature 3">
+            <button type="button" class="remove-plan" onclick="removePlan(this)">
+                <i class="fas fa-times-circle"></i>
+            </button>
+        `;
+        container.appendChild(div);
+        planCounter++;
+        showToast('➕ New plan added', 'info');
+    }
+
+    function removePlan(btn) {
+        const item = btn.closest('.pricing-plan-item');
+        if (item) {
+            if (document.querySelectorAll('.pricing-plan-item').length <= 1) {
+                showToast('⚠️ Cannot remove the last plan', 'warning');
+                return;
+            }
+            item.style.transition = 'all 0.3s ease';
+            item.style.opacity = '0';
+            item.style.transform = 'scale(0.92)';
+            setTimeout(() => item.remove(), 300);
+            showToast('🗑️ Plan removed', 'info');
+        }
+    }
+
+    function resetPricing() {
+        if (!confirm('⚠️ Reset pricing to default values?')) return;
+        
+        const defaults = [
+            { name: 'Starter', duration: '24 Hours', price: '49', features: '1 file run, 512MB RAM, Real-time logs' },
+            { name: 'Basic', duration: '7 Days', price: '199', features: 'Multi-file upload, pip/npm install, 24/7 uptime' },
+            { name: 'Pro', duration: '30 Days', price: '599', features: 'Unlimited modules, Priority support, Auto-restart' },
+            { name: 'Premium', duration: 'Lifetime', price: '1999', features: 'All features, Custom domain, Dedicated help' }
+        ];
+
+        const container = document.getElementById('plansContainer');
+        container.innerHTML = '';
+        
+        defaults.forEach((p, i) => {
+            const div = document.createElement('div');
+            div.className = 'pricing-plan-item';
+            div.innerHTML = `
+                <input type="text" name="p_name" value="${p.name}" placeholder="Plan Name">
+                <input type="text" name="p_duration" value="${p.duration}" placeholder="Duration">
+                <input type="text" name="p_price" value="${p.price}" placeholder="Price">
+                <input type="text" name="p_features" value="${p.features}" placeholder="Features">
+                <button type="button" class="remove-plan" onclick="removePlan(this)">
+                    <i class="fas fa-times-circle"></i>
+                </button>
+            `;
+            container.appendChild(div);
+        });
+        
+        document.getElementById('pricingCurrency').value = '₹';
+        document.getElementById('pricingContact').value = 'Telegram: @sasi_vps';
+        
+        showToast('✅ Pricing reset to defaults', 'success');
+    }
+
+    // ============================================================
+    // SECTION 7: CREATE USER FORM - AUTO FOCUS
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const usernameInput = document.getElementById('createUsername');
+        if (usernameInput) {
+            // Focus if no users exist
+            const userCount = document.querySelectorAll('#userTable tbody tr').length;
+            if (userCount === 0) {
+                setTimeout(() => usernameInput.focus(), 500);
+            }
+        }
+
+        // Auto-generate password suggestion
+        const passInput = document.getElementById('createPassword');
+        const hoursInput = document.getElementById('createHours');
+        
+        // Generate random password on focus
+        passInput?.addEventListener('focus', function() {
+            if (!this.value) {
+                const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+                let password = '';
+                for (let i = 0; i < 12; i++) {
+                    password += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                this.value = password;
+            }
+        });
+    });
+
+    // ============================================================
+    // SECTION 8: KEYBOARD SHORTCUTS
+    // ============================================================
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+N = focus on create user form
+        if (e.ctrlKey && e.key === 'n') {
+            e.preventDefault();
+            document.getElementById('createUsername')?.focus();
+        }
+        
+        // Ctrl+F = focus search
+        if (e.ctrlKey && e.key === 'f') {
+            e.preventDefault();
+            document.getElementById('searchUsers')?.focus();
+        }
+        
+        // Escape = clear search
+        if (e.key === 'Escape') {
+            const search = document.getElementById('searchUsers');
+            if (search && document.activeElement === search) {
+                search.value = '';
+                filterUsers('');
+                search.blur();
+            }
+        }
+    });
+
+    // ============================================================
+    // SECTION 9: CONSOLE WELCOME
+    // ============================================================
+    console.log('%c👑 SasiVPS Owner Dashboard', 'font-size: 20px; font-weight: 800; color: #00ff88; text-shadow: 0 0 20px rgba(0,255,136,0.2);');
+    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #444444;');
+    console.log('%c  📊 Total Users: {{ total_users }}', 'font-size: 13px; color: #8892bf;');
+    console.log('%c  🟢 Active: {{ active_users }}  🔴 Expired: {{ expired_users }}', 'font-size: 13px; color: #8892bf;');
+    console.log('%c  ⌨️  Shortcuts:', 'font-size: 12px; font-weight: 600; color: #5a6a8a;');
+    console.log('%c     Ctrl+N  → Focus Create User', 'font-size: 12px; color: #5a6a8a;');
+    console.log('%c     Ctrl+F  → Focus Search', 'font-size: 12px; color: #5a6a8a;');
+    console.log('%c     Escape  → Clear Search', 'font-size: 12px; color: #5a6a8a;');
+    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #444444;');
+    console.log('%c🚀 Manage your VPS empire!', 'font-size: 14px; font-weight: 600; color: #00d4ff;');
+
+    // ============================================================
+    // SECTION 10: TOAST FOR CREATE USER
+    // ============================================================
+    // Check if user was just created (flash from server)
+    const flashMsg = sessionStorage.getItem('flash');
+    if (flashMsg) {
+        try {
+            const data = JSON.parse(flashMsg);
+            showToast(data.message, data.type || 'info');
+        } catch(e) {}
+        sessionStorage.removeItem('flash');
+    }
+
+    // ============================================================
+    // SECTION 11: ANIMATE STAT BARS ON LOAD
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const bars = document.querySelectorAll('.stat-progress .bar');
+        bars.forEach((bar, index) => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.width = width;
+            }, 300 + (index * 100));
+        });
+    });
+
+    // ============================================================
+    // SECTION 12: CONFIRM DELETE WITH DETAILS
+    // ============================================================
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const form = this.closest('form');
+            const username = form?.querySelector('input[name="username"]')?.value || 
+                            form?.closest('tr')?.dataset?.username || 
+                            'this user';
+            
+            if (!confirm(`⚠️ Delete user "${username}" permanently?\n\nThis action cannot be undone!\nAll files and data will be removed.`)) {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // ============================================================
+    // SECTION 13: EXTEND CONFIRMATION
+    // ============================================================
+    document.querySelectorAll('.btn-extend').forEach(group => {
+        const btn = group.querySelector('button[type="submit"]');
+        const input = group.querySelector('input');
+        if (btn && input) {
+            btn.addEventListener('click', function(e) {
+                const hours = input.value;
+                if (!hours || parseFloat(hours) <= 0) {
+                    e.preventDefault();
+                    showToast('⚠️ Please enter a valid number of hours', 'warning');
+                    return;
+                }
+                if (!confirm(`⏰ Extend by ${hours} hours?`)) {
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

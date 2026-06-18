@@ -1,0 +1,1057 @@
+{% extends "base.html" %}
+{% block title %}Pricing — SasiVPS{% endblock %}
+
+{% block head %}
+<style>
+    /* ================================================================
+               PRICING PAGE SPECIFIC STYLES — NEON THEME
+               ================================================================ */
+    
+    /* ----- Page Container ----- */
+    .pricing-wrapper {
+        padding: 20px 0 40px;
+        position: relative;
+    }
+    
+    /* Animated background glow */
+    .pricing-wrapper::before {
+        content: '';
+        position: fixed;
+        top: -30%;
+        right: -20%;
+        width: 60%;
+        height: 60%;
+        background: radial-gradient(ellipse, rgba(0, 255, 136, 0.03) 0%, transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+        animation: pricing-glow 10s ease-in-out infinite alternate;
+    }
+    .pricing-wrapper::after {
+        content: '';
+        position: fixed;
+        bottom: -30%;
+        left: -20%;
+        width: 60%;
+        height: 60%;
+        background: radial-gradient(ellipse, rgba(0, 212, 255, 0.02) 0%, transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+        animation: pricing-glow 12s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes pricing-glow {
+        0% { opacity: 0.3; transform: scale(1) rotate(0deg); }
+        100% { opacity: 0.7; transform: scale(1.1) rotate(2deg); }
+    }
+
+    /* ----- Page Header ----- */
+    .pricing-header {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        padding: 40px 20px 30px;
+        animation: fade-down 0.6s ease-out;
+    }
+    @keyframes fade-down {
+        0% { opacity: 0; transform: translateY(-20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .pricing-header .header-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 16px 4px 10px;
+        border-radius: var(--radius-full);
+        background: rgba(0, 255, 136, 0.04);
+        border: 1px solid rgba(0, 255, 136, 0.06);
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #00ff88;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 16px;
+    }
+    .pricing-header .header-badge .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: var(--radius-full);
+        background: #00ff88;
+        animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.4; transform: scale(0.7); }
+    }
+    .pricing-header h1 {
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        font-weight: 900;
+        margin: 0 0 8px;
+        letter-spacing: -0.02em;
+    }
+    .pricing-header h1 .highlight {
+        background: var(--gradient-main);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    .pricing-header p {
+        font-size: clamp(0.95rem, 1.2vw, 1.15rem);
+        color: var(--text-muted);
+        max-width: 520px;
+        margin: 0 auto;
+    }
+
+    /* ----- Toggle (Monthly/Yearly) ----- */
+    .pricing-toggle {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin-bottom: 36px;
+        animation: fade-up 0.6s ease-out 0.1s both;
+    }
+    .pricing-toggle .toggle-label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        transition: color var(--transition-fast);
+        cursor: pointer;
+    }
+    .pricing-toggle .toggle-label.active {
+        color: var(--text-primary);
+    }
+    .pricing-toggle .toggle-switch {
+        width: 52px;
+        height: 28px;
+        border-radius: var(--radius-full);
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(0, 255, 136, 0.06);
+        cursor: pointer;
+        position: relative;
+        transition: all var(--transition-normal);
+        flex-shrink: 0;
+    }
+    .pricing-toggle .toggle-switch:hover {
+        border-color: rgba(0, 255, 136, 0.10);
+    }
+    .pricing-toggle .toggle-switch .toggle-knob {
+        width: 20px;
+        height: 20px;
+        border-radius: var(--radius-full);
+        background: var(--gradient-main);
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        transition: all var(--transition-normal);
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.10);
+    }
+    .pricing-toggle .toggle-switch.active .toggle-knob {
+        left: 27px;
+    }
+    .pricing-toggle .toggle-badge {
+        font-size: 0.6rem;
+        padding: 2px 10px;
+        border-radius: var(--radius-full);
+        background: rgba(0, 255, 136, 0.06);
+        color: #00ff88;
+        border: 1px solid rgba(0, 255, 136, 0.06);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    /* ----- Pricing Grid ----- */
+    .pricing-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 24px;
+        margin-bottom: 40px;
+    }
+
+    /* ----- Pricing Card ----- */
+    .pricing-card {
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 255, 136, 0.04);
+        border-radius: var(--radius-lg);
+        padding: 28px 24px 24px;
+        transition: all var(--transition-normal);
+        position: relative;
+        overflow: hidden;
+        animation: scale-in 0.5s ease-out forwards;
+        opacity: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    .pricing-card:nth-child(1) { animation-delay: 0.05s; }
+    .pricing-card:nth-child(2) { animation-delay: 0.10s; }
+    .pricing-card:nth-child(3) { animation-delay: 0.15s; }
+    .pricing-card:nth-child(4) { animation-delay: 0.20s; }
+    @keyframes scale-in {
+        0% { opacity: 0; transform: scale(0.95); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+    .pricing-card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(0, 255, 136, 0.08);
+        box-shadow: var(--shadow-card-hover), var(--shadow-glow);
+    }
+    .pricing-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--gradient-main);
+        opacity: 0;
+        transition: opacity var(--transition-normal);
+    }
+    .pricing-card:hover::before {
+        opacity: 1;
+    }
+
+    /* Popular badge */
+    .pricing-card.popular {
+        border-color: rgba(0, 255, 136, 0.10);
+        box-shadow: var(--shadow-card), var(--shadow-glow);
+        transform: scale(1.02);
+    }
+    .pricing-card.popular:hover {
+        transform: scale(1.02) translateY(-6px);
+        box-shadow: var(--shadow-card-hover), var(--shadow-glow-strong);
+    }
+    .pricing-card.popular::before {
+        opacity: 1;
+    }
+    .pricing-card .popular-badge {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--gradient-main);
+        color: #000000;
+        font-size: 0.6rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 4px 16px;
+        border-radius: var(--radius-full);
+        box-shadow: 0 0 30px rgba(0, 255, 136, 0.10);
+        white-space: nowrap;
+    }
+    .pricing-card .popular-badge i {
+        margin-right: 4px;
+    }
+
+    /* Card content */
+    .pricing-card .plan-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 2px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .pricing-card .plan-name .plan-icon {
+        font-size: 1.2rem;
+    }
+    .pricing-card .plan-desc {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 16px;
+    }
+    .pricing-card .plan-price {
+        font-size: 2.8rem;
+        font-weight: 900;
+        font-family: var(--font-mono);
+        color: #00ff88;
+        text-shadow: 0 0 30px rgba(0, 255, 136, 0.05);
+        line-height: 1;
+        margin-bottom: 2px;
+    }
+    .pricing-card .plan-price .currency {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-right: 2px;
+    }
+    .pricing-card .plan-price .period {
+        font-size: 0.8rem;
+        font-weight: 400;
+        color: var(--text-muted);
+        font-family: var(--font-sans);
+        margin-left: 4px;
+    }
+    .pricing-card .plan-price .original-price {
+        font-size: 1rem;
+        font-weight: 400;
+        color: var(--text-dimmed);
+        text-decoration: line-through;
+        margin-left: 8px;
+        font-family: var(--font-sans);
+    }
+    .pricing-card .plan-savings {
+        display: inline-block;
+        font-size: 0.6rem;
+        font-weight: 700;
+        color: #00ff88;
+        background: rgba(0, 255, 136, 0.06);
+        padding: 2px 12px;
+        border-radius: var(--radius-full);
+        border: 1px solid rgba(0, 255, 136, 0.06);
+        margin-top: 4px;
+        margin-bottom: 12px;
+    }
+
+    /* Features list */
+    .pricing-card .features-list {
+        list-style: none;
+        padding: 0;
+        margin: 16px 0 20px;
+        flex: 1;
+    }
+    .pricing-card .features-list li {
+        padding: 6px 0;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid rgba(0, 255, 136, 0.02);
+        transition: all var(--transition-fast);
+    }
+    .pricing-card .features-list li:last-child {
+        border-bottom: none;
+    }
+    .pricing-card .features-list li:hover {
+        color: var(--text-primary);
+        padding-left: 4px;
+    }
+    .pricing-card .features-list li .check {
+        color: #00ff88;
+        font-weight: 700;
+        flex-shrink: 0;
+        font-size: 0.8rem;
+        width: 18px;
+        text-align: center;
+    }
+    .pricing-card .features-list li .check i {
+        font-size: 0.75rem;
+    }
+    .pricing-card .features-list li .feature-muted {
+        color: var(--text-dimmed);
+        font-size: 0.75rem;
+    }
+    .pricing-card .features-list li .feature-icon {
+        font-size: 0.8rem;
+        flex-shrink: 0;
+        width: 20px;
+        text-align: center;
+    }
+    .pricing-card .features-list li .feature-tag {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+        border-radius: var(--radius-full);
+        background: rgba(0, 255, 136, 0.04);
+        color: #00ff88;
+        border: 1px solid rgba(0, 255, 136, 0.04);
+        margin-left: auto;
+    }
+
+    /* CTA Button */
+    .pricing-card .btn-cta {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        border: none;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        font-family: var(--font-sans);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: auto;
+    }
+    .pricing-card .btn-cta.primary {
+        background: var(--gradient-main);
+        color: #000000;
+        box-shadow: 0 0 30px rgba(0, 255, 136, 0.05);
+    }
+    .pricing-card .btn-cta.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 50px rgba(0, 255, 136, 0.10);
+    }
+    .pricing-card .btn-cta.ghost {
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--text-secondary);
+        border: 1px solid rgba(0, 255, 136, 0.04);
+    }
+    .pricing-card .btn-cta.ghost:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(0, 255, 136, 0.08);
+        transform: translateY(-2px);
+        color: var(--text-primary);
+    }
+    .pricing-card .btn-cta:active {
+        transform: scale(0.97);
+    }
+
+    /* ----- Contact Section ----- */
+    .contact-section {
+        position: relative;
+        z-index: 1;
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 255, 136, 0.04);
+        border-radius: var(--radius-lg);
+        padding: 28px 32px;
+        text-align: center;
+        animation: fade-up 0.5s ease-out 0.3s both;
+        transition: all var(--transition-normal);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .contact-section:hover {
+        border-color: rgba(0, 255, 136, 0.06);
+        box-shadow: var(--shadow-card-hover), var(--shadow-glow);
+    }
+    .contact-section .contact-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-full);
+        background: rgba(0, 255, 136, 0.04);
+        display: grid;
+        place-items: center;
+        font-size: 1.2rem;
+        color: #00ff88;
+        margin: 0 auto 12px;
+        border: 1px solid rgba(0, 255, 136, 0.04);
+    }
+    .contact-section h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0 0 4px;
+    }
+    .contact-section p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin: 0 0 12px;
+    }
+    .contact-section .contact-value {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 20px;
+        background: rgba(0, 0, 0, 0.15);
+        border-radius: var(--radius-full);
+        border: 1px solid rgba(0, 255, 136, 0.04);
+        font-family: var(--font-mono);
+        font-size: 0.9rem;
+        color: #00ff88;
+        transition: all var(--transition-fast);
+    }
+    .contact-section .contact-value:hover {
+        border-color: rgba(0, 255, 136, 0.08);
+        background: rgba(0, 0, 0, 0.20);
+    }
+    .contact-section .contact-value .copy-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 2px 6px;
+        border-radius: var(--radius-sm);
+        transition: all var(--transition-fast);
+        font-size: 0.8rem;
+    }
+    .contact-section .contact-value .copy-btn:hover {
+        color: #00ff88;
+        background: rgba(0, 255, 136, 0.04);
+    }
+
+    /* ----- FAQ Section ----- */
+    .faq-section {
+        position: relative;
+        z-index: 1;
+        margin-top: 36px;
+        padding: 0 20px;
+        animation: fade-up 0.5s ease-out 0.35s both;
+    }
+    .faq-section .faq-title {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .faq-section .faq-title h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .faq-section .faq-title h3 i {
+        color: #ffe600;
+    }
+    .faq-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 14px;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .faq-item {
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 255, 136, 0.03);
+        border-radius: var(--radius-md);
+        padding: 14px 18px;
+        cursor: pointer;
+        transition: all var(--transition-normal);
+    }
+    .faq-item:hover {
+        border-color: rgba(0, 255, 136, 0.04);
+        background: var(--bg-card-hover);
+    }
+    .faq-item .faq-question {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+    .faq-item .faq-question .faq-arrow {
+        transition: transform var(--transition-normal);
+        color: var(--text-muted);
+        font-size: 0.8rem;
+    }
+    .faq-item.active .faq-question .faq-arrow {
+        transform: rotate(180deg);
+    }
+    .faq-item .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+        opacity: 0;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+    .faq-item.active .faq-answer {
+        max-height: 300px;
+        opacity: 1;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(0, 255, 136, 0.03);
+    }
+
+    /* ================================================================
+               RESPONSIVE
+               ================================================================ */
+    @media (max-width: 1024px) {
+        .pricing-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .pricing-card.popular {
+            transform: scale(1);
+        }
+        .pricing-card.popular:hover {
+            transform: translateY(-6px);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .pricing-wrapper::before,
+        .pricing-wrapper::after {
+            display: none;
+        }
+        .pricing-header {
+            padding: 20px 16px 20px;
+        }
+        .pricing-grid {
+            grid-template-columns: 1fr;
+            max-width: 400px;
+            margin: 0 auto 30px;
+        }
+        .pricing-card {
+            padding: 20px 18px;
+        }
+        .pricing-card .plan-price {
+            font-size: 2.2rem;
+        }
+        .pricing-toggle {
+            gap: 10px;
+        }
+        .pricing-toggle .toggle-label {
+            font-size: 0.75rem;
+        }
+        .contact-section {
+            padding: 20px 16px;
+            margin: 0 8px;
+        }
+        .contact-section .contact-value {
+            font-size: 0.8rem;
+            padding: 6px 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .faq-grid {
+            grid-template-columns: 1fr;
+        }
+        .pricing-card .popular-badge {
+            font-size: 0.55rem;
+            padding: 3px 12px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .pricing-header h1 {
+            font-size: 1.8rem;
+        }
+        .pricing-header p {
+            font-size: 0.9rem;
+        }
+        .pricing-card {
+            padding: 16px 14px;
+        }
+        .pricing-card .plan-price {
+            font-size: 1.8rem;
+        }
+        .pricing-card .plan-price .currency {
+            font-size: 1rem;
+        }
+        .pricing-card .features-list li {
+            font-size: 0.78rem;
+            padding: 4px 0;
+        }
+        .pricing-card .btn-cta {
+            font-size: 0.8rem;
+            padding: 10px 16px;
+        }
+        .pricing-toggle .toggle-switch {
+            width: 44px;
+            height: 24px;
+        }
+        .pricing-toggle .toggle-switch .toggle-knob {
+            width: 17px;
+            height: 17px;
+            top: 2.5px;
+            left: 2.5px;
+        }
+        .pricing-toggle .toggle-switch.active .toggle-knob {
+            left: 23px;
+        }
+        .pricing-toggle .toggle-badge {
+            font-size: 0.5rem;
+            padding: 1px 8px;
+        }
+        .contact-section .contact-value {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            gap: 6px;
+        }
+        .faq-item {
+            padding: 10px 14px;
+        }
+        .faq-item .faq-question {
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- ================================================================
+PRICING PAGE BODY
+=============================================================== -->
+
+<div class="pricing-wrapper">
+    <div class="container">
+        <!-- ===== HEADER ===== -->
+        <header class="pricing-header">
+            <div class="header-badge">
+                <span class="dot"></span>
+                <span><i class="fas fa-crown"></i> Flexible Pricing</span>
+            </div>
+            <h1>
+                Choose Your <span class="highlight">Plan</span>
+            </h1>
+            <p>
+                Select the perfect plan for your project. All plans include 
+                <strong style="color: var(--text-secondary);">24/7 support</strong> and 
+                <strong style="color: var(--text-secondary);">auto-login</strong> access.
+            </p>
+        </header>
+
+        <!-- ===== TOGGLE ===== -->
+        <div class="pricing-toggle">
+            <span class="toggle-label active" id="monthlyLabel">Monthly</span>
+            <div class="toggle-switch" id="pricingToggle" onclick="togglePricing()">
+                <div class="toggle-knob"></div>
+            </div>
+            <span class="toggle-label" id="yearlyLabel">Yearly</span>
+            <span class="toggle-badge"><i class="fas fa-tag"></i> Save 20%</span>
+        </div>
+
+        <!-- ===== PRICING GRID ===== -->
+        <div class="pricing-grid" id="pricingGrid">
+            {% for p in pricing.plans %}
+            <div class="pricing-card {% if loop.index == 3 %}popular{% endif %}" 
+                 data-plan="{{ loop.index }}"
+                 data-monthly="{{ p.price }}"
+                 data-yearly="{{ (p.price|int * 10)|string }}">
+                {% if loop.index == 3 %}
+                <div class="popular-badge">
+                    <i class="fas fa-star"></i> Most Popular
+                </div>
+                {% endif %}
+                
+                <div class="plan-name">
+                    <span class="plan-icon">
+                        {% if loop.index == 1 %}🚀
+                        {% elif loop.index == 2 %}⚡
+                        {% elif loop.index == 3 %}👑
+                        {% else %}💎{% endif %}
+                    </span>
+                    {{ p.name }}
+                </div>
+                <div class="plan-desc">
+                    {% if loop.index == 1 %}Perfect for testing and small projects
+                    {% elif loop.index == 2 %}Great for growing applications
+                    {% elif loop.index == 3 %}The best value for professionals
+                    {% else %}Ultimate power for enterprises{% endif %}
+                </div>
+                
+                <div class="plan-price" id="price-{{ loop.index }}">
+                    <span class="currency">{{ pricing.currency }}</span>
+                    <span class="price-value">{{ p.price }}</span>
+                    <span class="period">/ {{ p.duration }}</span>
+                    <span class="original-price" id="original-{{ loop.index }}" style="display: none;">
+                        {{ pricing.currency }}{{ (p.price|int * 1.25)|int }}
+                    </span>
+                </div>
+                <div class="plan-savings" id="savings-{{ loop.index }}" style="display: none;">
+                    <i class="fas fa-tag"></i> Save 20%
+                </div>
+                
+                <ul class="features-list">
+                    {% for feature in p.features.split(',') %}
+                    <li>
+                        <span class="check"><i class="fas fa-check-circle"></i></span>
+                        {{ feature.strip() }}
+                    </li>
+                    {% endfor %}
+                    <li>
+                        <span class="check"><i class="fas fa-check-circle"></i></span>
+                        24/7 Priority Support
+                        <span class="feature-tag">Live</span>
+                    </li>
+                    <li>
+                        <span class="check"><i class="fas fa-check-circle"></i></span>
+                        Auto-login Link Access
+                        <span class="feature-tag">Instant</span>
+                    </li>
+                    {% if loop.index >= 3 %}
+                    <li>
+                        <span class="check"><i class="fas fa-check-circle"></i></span>
+                        Custom Domain Support
+                        <span class="feature-tag">Pro</span>
+                    </li>
+                    {% endif %}
+                </ul>
+                
+                <a href="/login" class="btn-cta {% if loop.index == 3 %}primary{% else %}ghost{% endif %}">
+                    {% if loop.index == 3 %}
+                    <i class="fas fa-rocket"></i> Get Started Now
+                    {% else %}
+                    Choose Plan <i class="fas fa-arrow-right"></i>
+                    {% endif %}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- ===== CONTACT SECTION ===== -->
+        {% if pricing.contact %}
+        <div class="contact-section">
+            <div class="contact-icon">
+                <i class="fas fa-headset"></i>
+            </div>
+            <h3>Need a Custom Plan?</h3>
+            <p>
+                Contact the owner for enterprise plans, custom pricing, 
+                or bulk discounts.
+            </p>
+            <div class="contact-value" id="contactValue">
+                <i class="fas fa-telegram" style="color: #00d4ff;"></i>
+                <span id="contactText">{{ pricing.contact }}</span>
+                <button class="copy-btn" onclick="copyContact()" title="Copy contact">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ===== FAQ SECTION ===== -->
+        <div class="faq-section">
+            <div class="faq-title">
+                <h3>
+                    <i class="fas fa-question-circle"></i>
+                    Frequently Asked Questions
+                </h3>
+            </div>
+            <div class="faq-grid">
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question">
+                        <span><i class="fas fa-clock" style="color: #00d4ff;"></i> How long does setup take?</span>
+                        <span class="faq-arrow"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        Setup is instant! Once you purchase a plan, you'll receive an auto-login link immediately. No waiting time.
+                    </div>
+                </div>
+                
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question">
+                        <span><i class="fas fa-sync-alt" style="color: #ffe600;"></i> Can I upgrade my plan later?</span>
+                        <span class="faq-arrow"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        Yes! You can upgrade to any higher plan at any time. The price difference will be prorated automatically.
+                    </div>
+                </div>
+                
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question">
+                        <span><i class="fas fa-refund" style="color: #ff2d95;"></i> What's the refund policy?</span>
+                        <span class="faq-arrow"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        We offer a 7-day money-back guarantee. If you're not satisfied, contact the owner for a full refund.
+                    </div>
+                </div>
+                
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question">
+                        <span><i class="fas fa-server" style="color: #00ff88;"></i> What languages are supported?</span>
+                        <span class="faq-arrow"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        You can run Python (<code>.py</code>), Node.js (<code>.js</code>), and Shell (<code>.sh</code>) scripts. More languages coming soon!
+                    </div>
+                </div>
+                
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question">
+                        <span><i class="fas fa-shield-alt" style="color: #b44dff;"></i> Is my data secure?</span>
+                        <span class="faq-arrow"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        Yes! All data is encrypted and stored securely. Each user gets an isolated environment with automatic expiry.
+                    </div>
+                </div>
+                
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-question">
+                        <span><i class="fas fa-headset" style="color: #00d4ff;"></i> How do I get support?</span>
+                        <span class="faq-arrow"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        Contact the owner directly via the contact information above. We provide 24/7 support for all plans.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ================================================================
+SCRIPTS
+=============================================================== -->
+<script>
+    // ============================================================
+    // SECTION 1: PRICING TOGGLE (Monthly / Yearly)
+    // ============================================================
+    let isYearly = false;
+    const toggleSwitch = document.getElementById('pricingToggle');
+    const monthlyLabel = document.getElementById('monthlyLabel');
+    const yearlyLabel = document.getElementById('yearlyLabel');
+
+    function togglePricing() {
+        isYearly = !isYearly;
+        toggleSwitch.classList.toggle('active', isYearly);
+        monthlyLabel.classList.toggle('active', !isYearly);
+        yearlyLabel.classList.toggle('active', isYearly);
+        
+        const cards = document.querySelectorAll('.pricing-card');
+        cards.forEach((card, index) => {
+            const monthly = parseInt(card.dataset.monthly);
+            const yearly = parseInt(card.dataset.yearly);
+            const priceEl = document.getElementById(`price-${index + 1}`);
+            const savingsEl = document.getElementById(`savings-${index + 1}`);
+            const originalEl = document.getElementById(`original-${index + 1}`);
+            
+            if (priceEl) {
+                const valueSpan = priceEl.querySelector('.price-value');
+                const periodSpan = priceEl.querySelector('.period');
+                if (isYearly) {
+                    valueSpan.textContent = yearly;
+                    periodSpan.textContent = '/ Year';
+                    if (savingsEl) savingsEl.style.display = 'inline-block';
+                    if (originalEl) originalEl.style.display = 'inline';
+                } else {
+                    valueSpan.textContent = monthly;
+                    periodSpan.textContent = '/ ' + card.querySelector('.plan-desc')?.textContent?.includes('testing') ? '24 Hours' : 
+                                              (index === 0 ? '24 Hours' : index === 1 ? '7 Days' : index === 2 ? '30 Days' : 'Lifetime');
+                    if (savingsEl) savingsEl.style.display = 'none';
+                    if (originalEl) originalEl.style.display = 'none';
+                }
+            }
+        });
+        
+        // Show toast notification
+        showToast(isYearly ? '📅 Yearly pricing activated — Save 20%!' : '📆 Monthly pricing activated', 'info');
+    }
+
+    // ============================================================
+    // SECTION 2: FAQ TOGGLE
+    // ============================================================
+    function toggleFaq(element) {
+        const isActive = element.classList.contains('active');
+        // Close all others
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        if (!isActive) {
+            element.classList.add('active');
+        }
+    }
+
+    // ============================================================
+    // SECTION 3: COPY CONTACT
+    // ============================================================
+    function copyContact() {
+        const text = document.getElementById('contactText')?.textContent || '';
+        if (!text) return;
+        
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text)
+                .then(() => showToast('📋 Contact copied to clipboard!', 'success'))
+                .catch(() => fallbackCopy(text));
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const input = document.createElement('input');
+        input.value = text;
+        document.body.appendChild(input);
+        input.select();
+        try {
+            document.execCommand('copy');
+            showToast('📋 Contact copied to clipboard!', 'success');
+        } catch (e) {
+            showToast('Failed to copy', 'error');
+        }
+        input.remove();
+    }
+
+    // ============================================================
+    // SECTION 4: KEYBOARD SHORTCUTS
+    // ============================================================
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+T = toggle pricing
+        if (e.ctrlKey && e.key === 't') {
+            e.preventDefault();
+            togglePricing();
+        }
+        
+        // Escape = close any open FAQs
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.faq-item.active').forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+        
+        // Ctrl+C = copy contact (when on contact section)
+        if (e.ctrlKey && e.key === 'c' && document.activeElement?.closest('.contact-section')) {
+            e.preventDefault();
+            copyContact();
+        }
+    });
+
+    // ============================================================
+    // SECTION 5: CONSOLE WELCOME
+    // ============================================================
+    console.log('%c💎 SasiVPS Pricing', 'font-size: 20px; font-weight: 800; color: #00ff88; text-shadow: 0 0 20px rgba(0,255,136,0.2);');
+    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #444444;');
+    console.log('%c  📊 Plans Available: {{ pricing.plans|length }}', 'font-size: 13px; color: #8892bf;');
+    console.log('%c  🔄 Press Ctrl+T to toggle Monthly/Yearly', 'font-size: 12px; color: #5a6a8a;');
+    console.log('%c  📋 Click the contact to copy', 'font-size: 12px; color: #5a6a8a;');
+    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #444444;');
+    console.log('%c🚀 Choose your plan and deploy today!', 'font-size: 14px; font-weight: 600; color: #00d4ff;');
+
+    // ============================================================
+    // SECTION 6: ANIMATE CARDS ON SCROLL
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if any card is already visible
+        const cards = document.querySelectorAll('.pricing-card');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'scale(1)';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        cards.forEach(card => {
+            observer.observe(card);
+        });
+        
+        // Auto-open first FAQ
+        const firstFaq = document.querySelector('.faq-item');
+        if (firstFaq) {
+            setTimeout(() => firstFaq.classList.add('active'), 500);
+        }
+        
+        // Check for flash message
+        const flashMsg = sessionStorage.getItem('flash');
+        if (flashMsg) {
+            try {
+                const data = JSON.parse(flashMsg);
+                showToast(data.message, data.type || 'info');
+            } catch(e) {}
+            sessionStorage.removeItem('flash');
+        }
+    });
+
+    // ============================================================
+    // SECTION 7: PRICING CARD HOVER SOUND EFFECT (Visual only)
+    // ============================================================
+    document.querySelectorAll('.pricing-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            // Subtle glow pulse on hover
+            this.style.transition = 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        });
+    });
+
+    // ============================================================
+    // SECTION 8: EXPOSE GLOBALS
+    // ============================================================
+    window.togglePricing = togglePricing;
+    window.toggleFaq = toggleFaq;
+    window.copyContact = copyContact;
+
+    console.log('%c✅ Pricing page ready!', 'font-size: 13px; color: #00ff88;');
+</script>
+{% endblock %}

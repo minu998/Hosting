@@ -1,0 +1,1562 @@
+{% extends "base.html" %}
+{% block title %}{{ username }}'s VPS — SasiVPS{% endblock %}
+
+{% block head %}
+<style>
+    /* ================================================================
+               USER DASHBOARD SPECIFIC STYLES — NEON THEME
+               ================================================================ */
+    
+    /* ----- Dashboard Container ----- */
+    .user-wrapper {
+        padding: 20px 0 40px;
+        position: relative;
+    }
+    
+    /* Animated background glow */
+    .user-wrapper::before {
+        content: '';
+        position: fixed;
+        top: -30%;
+        right: -20%;
+        width: 60%;
+        height: 60%;
+        background: radial-gradient(ellipse, rgba(0, 255, 136, 0.03) 0%, transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+        animation: user-glow 12s ease-in-out infinite alternate;
+    }
+    .user-wrapper::after {
+        content: '';
+        position: fixed;
+        bottom: -30%;
+        left: -20%;
+        width: 60%;
+        height: 60%;
+        background: radial-gradient(ellipse, rgba(0, 212, 255, 0.02) 0%, transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+        animation: user-glow 14s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes user-glow {
+        0% { opacity: 0.3; transform: scale(1) rotate(0deg); }
+        100% { opacity: 0.8; transform: scale(1.1) rotate(-3deg); }
+    }
+
+    /* ----- Header Section ----- */
+    .user-header {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+        padding: 20px 28px;
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 255, 136, 0.06);
+        border-radius: var(--radius-lg);
+        backdrop-filter: blur(16px);
+        box-shadow: var(--shadow-card), var(--shadow-glow);
+        animation: slide-down 0.5s ease-out;
+    }
+    @keyframes slide-down {
+        0% { opacity: 0; transform: translateY(-20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .user-header .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .user-header .header-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-full);
+        background: var(--gradient-main);
+        display: grid;
+        place-items: center;
+        font-size: 22px;
+        font-weight: 700;
+        color: #000000;
+        box-shadow: 0 0 40px rgba(0, 255, 136, 0.12);
+        animation: avatar-pulse 3s ease-in-out infinite;
+        text-transform: uppercase;
+    }
+    @keyframes avatar-pulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(0, 255, 136, 0.12); }
+        50% { transform: scale(1.04); box-shadow: 0 0 60px rgba(0, 255, 136, 0.20); }
+    }
+    .user-header .header-title h1 {
+        font-size: 1.4rem;
+        font-weight: 800;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .user-header .header-title h1 .username-display {
+        background: var(--gradient-main);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    .user-header .header-title p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin: 0;
+    }
+    .user-header .header-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .user-header .header-right .status-badge {
+        padding: 6px 16px;
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid transparent;
+    }
+    .user-header .header-right .status-badge.running {
+        background: rgba(0, 255, 136, 0.08);
+        color: #00ff88;
+        border-color: rgba(0, 255, 136, 0.12);
+        animation: pulse-badge 2s ease-in-out infinite;
+    }
+    .user-header .header-right .status-badge.stopped {
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--text-muted);
+        border-color: rgba(255, 255, 255, 0.04);
+    }
+    @keyframes pulse-badge {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
+    .user-header .header-right .expiry-box {
+        background: rgba(255, 230, 0, 0.04);
+        border: 1px solid rgba(255, 230, 0, 0.06);
+        border-radius: var(--radius-md);
+        padding: 4px 14px;
+        text-align: center;
+    }
+    .user-header .header-right .expiry-box .expiry-label {
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+    }
+    .user-header .header-right .expiry-box .expiry-value {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #ffe600;
+        font-family: var(--font-mono);
+    }
+
+    /* ----- Dashboard Grid ----- */
+    .dashboard-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    /* ----- Card Base ----- */
+    .dashboard-card {
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 255, 136, 0.05);
+        border-radius: var(--radius-lg);
+        padding: 20px 24px;
+        transition: all var(--transition-normal);
+        animation: fade-up 0.5s ease-out forwards;
+        opacity: 0;
+    }
+    .dashboard-card:nth-child(1) { animation-delay: 0.05s; }
+    .dashboard-card:nth-child(2) { animation-delay: 0.10s; }
+    .dashboard-card:nth-child(3) { animation-delay: 0.15s; }
+    .dashboard-card:nth-child(4) { animation-delay: 0.20s; }
+    .dashboard-card:nth-child(5) { animation-delay: 0.25s; }
+    .dashboard-card:nth-child(6) { animation-delay: 0.30s; }
+    
+    @keyframes fade-up {
+        0% { opacity: 0; transform: translateY(16px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .dashboard-card:hover {
+        border-color: rgba(0, 255, 136, 0.08);
+        box-shadow: var(--shadow-card-hover), var(--shadow-glow);
+    }
+    .dashboard-card .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(0, 255, 136, 0.04);
+    }
+    .dashboard-card .card-header h3 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .dashboard-card .card-header h3 i {
+        font-size: 1rem;
+    }
+    .dashboard-card .card-header .card-actions {
+        display: flex;
+        gap: 4px;
+    }
+
+    /* ----- Upload Card ----- */
+    .upload-zone {
+        border: 2px dashed rgba(0, 255, 136, 0.08);
+        border-radius: var(--radius-md);
+        padding: 24px 16px;
+        text-align: center;
+        transition: all var(--transition-normal);
+        cursor: pointer;
+        position: relative;
+    }
+    .upload-zone:hover {
+        border-color: rgba(0, 255, 136, 0.15);
+        background: rgba(0, 255, 136, 0.02);
+    }
+    .upload-zone.dragover {
+        border-color: rgba(0, 255, 136, 0.30);
+        background: rgba(0, 255, 136, 0.04);
+        box-shadow: 0 0 40px rgba(0, 255, 136, 0.04);
+    }
+    .upload-zone .upload-icon {
+        font-size: 2.5rem;
+        color: rgba(0, 255, 136, 0.10);
+        margin-bottom: 8px;
+        transition: all var(--transition-normal);
+    }
+    .upload-zone:hover .upload-icon {
+        color: rgba(0, 255, 136, 0.20);
+        transform: scale(1.05);
+    }
+    .upload-zone .upload-text {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+    .upload-zone .upload-text .highlight {
+        color: #00ff88;
+        font-weight: 600;
+    }
+    .upload-zone .upload-sub {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
+    .upload-zone input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+    .upload-progress {
+        margin-top: 12px;
+        display: none;
+    }
+    .upload-progress .progress-bar {
+        height: 4px;
+        border-radius: var(--radius-full);
+        background: rgba(255, 255, 255, 0.03);
+        overflow: hidden;
+    }
+    .upload-progress .progress-bar .fill {
+        height: 100%;
+        width: 0%;
+        background: var(--gradient-main);
+        border-radius: var(--radius-full);
+        transition: width 0.3s ease;
+    }
+    .upload-progress .progress-text {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+        text-align: right;
+    }
+
+    /* ----- File List ----- */
+    .file-list {
+        max-height: 280px;
+        overflow-y: auto;
+        margin: 0 -4px;
+    }
+    .file-list .file-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px;
+        border-radius: var(--radius-sm);
+        transition: all var(--transition-fast);
+        gap: 8px;
+        border-bottom: 1px solid rgba(0, 255, 136, 0.02);
+    }
+    .file-list .file-item:hover {
+        background: rgba(0, 255, 136, 0.02);
+    }
+    .file-list .file-item:last-child {
+        border-bottom: none;
+    }
+    .file-list .file-item .file-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        flex: 1;
+    }
+    .file-list .file-item .file-info .file-icon {
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+    .file-list .file-item .file-info .file-icon.py { color: #00d4ff; }
+    .file-list .file-item .file-info .file-icon.js { color: #ffe600; }
+    .file-list .file-item .file-info .file-icon.sh { color: #00ff88; }
+    .file-list .file-item .file-info .file-icon.html { color: #ff6b00; }
+    .file-list .file-item .file-info .file-icon.json { color: #b44dff; }
+    .file-list .file-item .file-info .file-icon.txt { color: var(--text-muted); }
+    .file-list .file-item .file-info .file-icon.default { color: var(--text-muted); }
+    
+    .file-list .file-item .file-info .file-name {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .file-list .file-item .file-actions {
+        display: flex;
+        gap: 4px;
+        flex-shrink: 0;
+    }
+    .file-list .file-item .file-actions .btn {
+        padding: 2px 8px;
+        font-size: 0.65rem;
+        border-radius: var(--radius-sm);
+    }
+    .file-list .file-item .file-actions .btn-start {
+        background: rgba(0, 255, 136, 0.06);
+        color: #00ff88;
+        border: 1px solid rgba(0, 255, 136, 0.06);
+    }
+    .file-list .file-item .file-actions .btn-start:hover {
+        background: rgba(0, 255, 136, 0.10);
+        border-color: rgba(0, 255, 136, 0.12);
+    }
+    .file-list .file-item .file-actions .btn-view {
+        background: rgba(0, 212, 255, 0.06);
+        color: #00d4ff;
+        border: 1px solid rgba(0, 212, 255, 0.06);
+    }
+    .file-list .file-item .file-actions .btn-view:hover {
+        background: rgba(0, 212, 255, 0.10);
+        border-color: rgba(0, 212, 255, 0.12);
+    }
+    .file-list .file-item .file-actions .btn-delete {
+        background: rgba(255, 0, 68, 0.06);
+        color: #ff0044;
+        border: 1px solid rgba(255, 0, 68, 0.06);
+    }
+    .file-list .file-item .file-actions .btn-delete:hover {
+        background: rgba(255, 0, 68, 0.10);
+        border-color: rgba(255, 0, 68, 0.12);
+    }
+
+    .file-list-empty {
+        text-align: center;
+        padding: 24px 16px;
+        color: var(--text-muted);
+    }
+    .file-list-empty .empty-icon {
+        font-size: 2rem;
+        color: rgba(0, 255, 136, 0.04);
+        margin-bottom: 8px;
+    }
+    .file-list-empty .empty-text {
+        font-size: 0.85rem;
+    }
+
+    /* ----- Controls Card ----- */
+    .controls-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .controls-grid .control-btn {
+        padding: 12px 8px;
+        border: 1px solid rgba(0, 255, 136, 0.04);
+        border-radius: var(--radius-md);
+        background: rgba(0, 0, 0, 0.15);
+        color: var(--text-secondary);
+        font-family: var(--font-sans);
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .controls-grid .control-btn:hover {
+        transform: translateY(-2px);
+    }
+    .controls-grid .control-btn:active {
+        transform: scale(0.96);
+    }
+    .controls-grid .control-btn .icon {
+        font-size: 1rem;
+    }
+    .controls-grid .control-btn.start {
+        border-color: rgba(0, 255, 136, 0.08);
+        color: #00ff88;
+    }
+    .controls-grid .control-btn.start:hover {
+        background: rgba(0, 255, 136, 0.04);
+        border-color: rgba(0, 255, 136, 0.12);
+        box-shadow: 0 0 30px rgba(0, 255, 136, 0.04);
+    }
+    .controls-grid .control-btn.stop {
+        border-color: rgba(255, 0, 68, 0.08);
+        color: #ff0044;
+    }
+    .controls-grid .control-btn.stop:hover {
+        background: rgba(255, 0, 68, 0.04);
+        border-color: rgba(255, 0, 68, 0.12);
+        box-shadow: 0 0 30px rgba(255, 0, 68, 0.04);
+    }
+    .controls-grid .control-btn.restart {
+        border-color: rgba(255, 230, 0, 0.08);
+        color: #ffe600;
+    }
+    .controls-grid .control-btn.restart:hover {
+        background: rgba(255, 230, 0, 0.04);
+        border-color: rgba(255, 230, 0, 0.12);
+        box-shadow: 0 0 30px rgba(255, 230, 0, 0.04);
+    }
+    .controls-grid .control-btn.clear {
+        border-color: rgba(255, 255, 255, 0.03);
+        color: var(--text-muted);
+    }
+    .controls-grid .control-btn.clear:hover {
+        background: rgba(255, 255, 255, 0.02);
+        border-color: rgba(255, 255, 255, 0.06);
+    }
+    .controls-grid .control-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+    /* ----- Server Status Display ----- */
+    .server-status {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        background: rgba(0, 0, 0, 0.15);
+        border-radius: var(--radius-md);
+        margin-top: 14px;
+        border: 1px solid rgba(0, 255, 136, 0.04);
+    }
+    .server-status .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: var(--radius-full);
+        flex-shrink: 0;
+        transition: all var(--transition-normal);
+    }
+    .server-status .status-dot.on {
+        background: #00ff88;
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.30);
+        animation: pulse-dot 1.5s ease-in-out infinite;
+    }
+    .server-status .status-dot.off {
+        background: #444444;
+    }
+    @keyframes pulse-dot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(0.8); }
+    }
+    .server-status .status-info {
+        flex: 1;
+    }
+    .server-status .status-info .status-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+    .server-status .status-info .status-file {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-family: var(--font-mono);
+    }
+
+    /* ----- Install Module ----- */
+    .install-form {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    .install-form input {
+        flex: 1;
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        background: var(--bg-input);
+        border: 1px solid rgba(0, 255, 136, 0.06);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-family: var(--font-mono);
+    }
+    .install-form input:focus {
+        border-color: rgba(0, 255, 136, 0.12);
+        box-shadow: var(--shadow-focus);
+        outline: none;
+    }
+    .install-form input::placeholder {
+        color: var(--text-dimmed);
+        font-family: var(--font-sans);
+    }
+    .install-form .btn-install {
+        padding: 10px 20px;
+        background: var(--gradient-main);
+        color: #000000;
+        border: none;
+        border-radius: var(--radius-md);
+        font-weight: 700;
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        font-family: var(--font-sans);
+        white-space: nowrap;
+    }
+    .install-form .btn-install:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 30px rgba(0, 255, 136, 0.10);
+    }
+    .install-form .btn-install:active {
+        transform: scale(0.96);
+    }
+    .install-helper {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .install-helper code {
+        font-size: 0.7rem;
+        padding: 2px 10px;
+        background: rgba(0, 0, 0, 0.20);
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(0, 255, 136, 0.04);
+        color: #00ff88;
+    }
+
+    /* ----- Logs ----- */
+    .logs-container {
+        background: rgba(0, 0, 0, 0.40);
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(0, 255, 136, 0.04);
+        overflow: hidden;
+        position: relative;
+    }
+    .logs-container .logs-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        background: rgba(0, 0, 0, 0.20);
+        border-bottom: 1px solid rgba(0, 255, 136, 0.04);
+    }
+    .logs-container .logs-header .logs-title {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .logs-container .logs-header .logs-title .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: var(--radius-full);
+        display: inline-block;
+    }
+    .logs-container .logs-header .logs-title .dot.live {
+        background: #00ff88;
+        animation: pulse-dot 1.5s ease-in-out infinite;
+    }
+    .logs-container .logs-header .logs-actions {
+        display: flex;
+        gap: 4px;
+    }
+    .logs-container .logs-header .logs-actions .btn {
+        padding: 2px 8px;
+        font-size: 0.6rem;
+        border-radius: var(--radius-sm);
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--text-muted);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        font-family: var(--font-sans);
+    }
+    .logs-container .logs-header .logs-actions .btn:hover {
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text-secondary);
+    }
+    .logs-container .logs-body {
+        padding: 12px 14px;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        line-height: 1.6;
+        max-height: 320px;
+        overflow-y: auto;
+        color: #a6f3a6;
+        white-space: pre-wrap;
+        word-break: break-all;
+        min-height: 120px;
+    }
+    .logs-container .logs-body .log-empty {
+        color: var(--text-dimmed);
+        font-style: italic;
+        font-family: var(--font-sans);
+    }
+    .logs-container .logs-body .log-line {
+        animation: log-in 0.15s ease-out;
+    }
+    @keyframes log-in {
+        0% { opacity: 0; transform: translateX(-4px); }
+        100% { opacity: 1; transform: translateX(0); }
+    }
+    .logs-container .logs-body .log-line .log-time {
+        color: var(--text-dimmed);
+        margin-right: 8px;
+        user-select: none;
+    }
+    .logs-container .logs-body .log-line .log-ok { color: #00ff88; }
+    .logs-container .logs-body .log-line .log-error { color: #ff0044; }
+    .logs-container .logs-body .log-line .log-warn { color: #ffe600; }
+    .logs-container .logs-body .log-line .log-info { color: #00d4ff; }
+
+    /* ----- Install Logs ----- */
+    .install-logs {
+        background: rgba(0, 0, 0, 0.30);
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(0, 255, 136, 0.03);
+        padding: 10px 14px;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        line-height: 1.5;
+        max-height: 120px;
+        overflow-y: auto;
+        color: #9fd3ff;
+        white-space: pre-wrap;
+        word-break: break-all;
+        min-height: 60px;
+        margin-top: 8px;
+    }
+    .install-logs .install-empty {
+        color: var(--text-dimmed);
+        font-style: italic;
+        font-family: var(--font-sans);
+    }
+
+    /* ================================================================
+               RESPONSIVE
+               ================================================================ */
+    @media (max-width: 1024px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .user-header {
+            padding: 16px 18px;
+            flex-direction: column;
+            align-items: stretch;
+            text-align: center;
+        }
+        .user-header .header-left {
+            justify-content: center;
+        }
+        .user-header .header-right {
+            justify-content: center;
+        }
+        .user-header .header-right .expiry-box .expiry-value {
+            font-size: 0.9rem;
+        }
+        .dashboard-card {
+            padding: 16px 18px;
+        }
+        .controls-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .controls-grid .control-btn {
+            padding: 10px 6px;
+            font-size: 0.7rem;
+        }
+        .controls-grid .control-btn .icon {
+            font-size: 0.85rem;
+        }
+        .install-form {
+            flex-direction: column;
+        }
+        .install-form .btn-install {
+            width: 100%;
+            justify-content: center;
+        }
+        .user-wrapper::before,
+        .user-wrapper::after {
+            display: none;
+        }
+        .file-list .file-item {
+            flex-wrap: wrap;
+        }
+        .file-list .file-item .file-actions {
+            margin-left: auto;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .user-header .header-avatar {
+            width: 44px;
+            height: 44px;
+            font-size: 16px;
+        }
+        .user-header .header-title h1 {
+            font-size: 1.1rem;
+        }
+        .user-header .header-right .status-badge {
+            font-size: 0.65rem;
+            padding: 4px 12px;
+        }
+        .controls-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+        .controls-grid .control-btn {
+            font-size: 0.65rem;
+            padding: 8px 4px;
+        }
+        .dashboard-card .card-header h3 {
+            font-size: 0.85rem;
+        }
+        .logs-container .logs-body {
+            font-size: 0.65rem;
+            max-height: 200px;
+        }
+        .install-logs {
+            font-size: 0.6rem;
+            max-height: 80px;
+        }
+        .upload-zone {
+            padding: 16px 12px;
+        }
+        .upload-zone .upload-icon {
+            font-size: 2rem;
+        }
+    }
+
+    /* ================================================================
+               SCROLLBAR STYLING FOR LOGS
+               ================================================================ */
+    .logs-container .logs-body::-webkit-scrollbar,
+    .install-logs::-webkit-scrollbar,
+    .file-list::-webkit-scrollbar {
+        width: 3px;
+    }
+    .logs-container .logs-body::-webkit-scrollbar-track,
+    .install-logs::-webkit-scrollbar-track,
+    .file-list::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .logs-container .logs-body::-webkit-scrollbar-thumb,
+    .install-logs::-webkit-scrollbar-thumb,
+    .file-list::-webkit-scrollbar-thumb {
+        background: rgba(0, 255, 136, 0.15);
+        border-radius: var(--radius-full);
+    }
+    .logs-container .logs-body::-webkit-scrollbar-thumb:hover,
+    .install-logs::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 255, 136, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- ================================================================
+USER DASHBOARD BODY
+=============================================================== -->
+
+<div class="user-wrapper">
+    <div class="container">
+        <!-- ===== HEADER ===== -->
+        <header class="user-header">
+            <div class="header-left">
+                <div class="header-avatar">{{ username[0]|upper }}</div>
+                <div class="header-title">
+                    <h1>
+                        <span class="username-display">{{ username }}</span>
+                        <span class="badge badge-primary" style="font-size: 0.55rem; padding: 2px 10px;">VPS</span>
+                    </h1>
+                    <p>
+                        <i class="fas fa-server" style="color: #00ff88; font-size: 0.7rem;"></i>
+                        {% if running %}
+                            <span style="color: #00ff88;">● Running</span> — {{ running_file }}
+                        {% else %}
+                            <span style="color: var(--text-muted);">○ Stopped</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <div class="header-right">
+                {% if expires_at %}
+                <div class="expiry-box">
+                    <div class="expiry-label">
+                        <i class="fas fa-hourglass-half"></i> Expires in
+                    </div>
+                    <div class="expiry-value" id="expiryCountdown">
+                        {{ ((expires_at - now)/3600)|round(1) }}h
+                    </div>
+                </div>
+                {% endif %}
+                <span class="status-badge {% if running %}running{% else %}stopped{% endif %}" id="statusBadge">
+                    {% if running %}
+                        <i class="fas fa-circle" style="font-size: 6px;"></i> Running
+                    {% else %}
+                        <i class="fas fa-circle" style="font-size: 6px;"></i> Stopped
+                    {% endif %}
+                </span>
+            </div>
+        </header>
+
+        <!-- ===== DASHBOARD GRID ===== -->
+        <div class="dashboard-grid">
+
+            <!-- ===== COLUMN 1 ===== -->
+            <div>
+
+                <!-- Upload Card -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-cloud-upload-alt" style="color: #00ff88;"></i> Upload Files</h3>
+                        <span class="badge badge-primary" style="font-size: 0.55rem;">max 200MB</span>
+                    </div>
+                    <form method="post" action="/upload" enctype="multipart/form-data" id="uploadForm">
+                        <div class="upload-zone" id="uploadZone">
+                            <div class="upload-icon"><i class="fas fa-file-upload"></i></div>
+                            <div class="upload-text">
+                                Drop files here or <span class="highlight">browse</span>
+                            </div>
+                            <div class="upload-sub">
+                                <i class="fas fa-code"></i> .py · .js · .sh · .html · .json · any
+                            </div>
+                            <input type="file" name="files" multiple id="fileInput" onchange="document.getElementById('uploadForm').submit();">
+                        </div>
+                        <div class="upload-progress" id="uploadProgress">
+                            <div class="progress-bar">
+                                <div class="fill" id="uploadFill"></div>
+                            </div>
+                            <div class="progress-text" id="uploadText">0%</div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Files Card -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-folder" style="color: #00d4ff;"></i> Files <span class="badge badge-primary" style="font-size: 0.6rem;">{{ files|length }}</span></h3>
+                        <button class="btn btn-ghost btn-sm" onclick="location.reload()" title="Refresh">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="file-list" id="fileList">
+                        {% if files %}
+                            {% for f in files %}
+                            <div class="file-item" data-file="{{ f }}">
+                                <div class="file-info">
+                                    {% set ext = f.split('.')[-1]|lower %}
+                                    <span class="file-icon 
+                                        {% if ext == 'py' %}py{% elif ext == 'js' %}js{% elif ext == 'sh' %}sh{% elif ext == 'html' %}html{% elif ext == 'json' %}json{% elif ext == 'txt' %}txt{% else %}default{% endif %}">
+                                        <i class="fas 
+                                            {% if ext == 'py' %}fa-python
+                                            {% elif ext == 'js' %}fa-js
+                                            {% elif ext == 'sh' %}fa-terminal
+                                            {% elif ext == 'html' %}fa-html5
+                                            {% elif ext == 'json' %}fa-code
+                                            {% elif ext == 'txt' %}fa-file-alt
+                                            {% else %}fa-file{% endif %}">
+                                        </i>
+                                    </span>
+                                    <span class="file-name" title="{{ f }}">{{ f }}</span>
+                                </div>
+                                <div class="file-actions">
+                                    <a href="/file/view/{{ f }}" target="_blank">
+                                        <button class="btn btn-view" type="button"><i class="fas fa-eye"></i></button>
+                                    </a>
+                                    {% if f.endswith(('.py', '.js', '.mjs', '.sh', '.html')) %}
+                                    <button class="btn btn-start" type="button" onclick="startFile('{{ f }}')">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                    {% endif %}
+                                    <form class="inline" method="post" action="/file/delete/{{ f }}" onsubmit="return confirm('Delete {{ f }}?')">
+                                        <button class="btn btn-delete" type="submit"><i class="fas fa-trash-alt"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="file-list-empty">
+                                <div class="empty-icon"><i class="fas fa-folder-open"></i></div>
+                                <div class="empty-text">No files yet. Upload one above.</div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Install Module Card -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-box" style="color: #b44dff;"></i> Install Module</h3>
+                        <span class="badge badge-primary" style="font-size: 0.55rem;">pip / npm</span>
+                    </div>
+                    <form class="install-form" onsubmit="return doInstall(event)">
+                        <input 
+                            type="text" 
+                            id="installCmd" 
+                            placeholder="pip install requests" 
+                            required
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+                        <button class="btn-install" type="submit" id="installBtn">
+                            <i class="fas fa-download"></i> Install
+                        </button>
+                    </form>
+                    <div class="install-helper">
+                        <span><i class="fas fa-info-circle"></i> Allowed:</span>
+                        <code>pip install &lt;module&gt;</code>
+                        <code>npm install &lt;module&gt;</code>
+                        <span style="color: var(--text-dimmed); font-size: 0.6rem;">
+                            <i class="fas fa-shield-alt"></i> Secure execution
+                        </span>
+                    </div>
+                    <div class="install-logs" id="installLogs">
+                        <div class="install-empty">Waiting for installation...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== COLUMN 2 ===== -->
+            <div>
+
+                <!-- Controls Card -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-sliders-h" style="color: #ffe600;"></i> Server Controls</h3>
+                        <span class="badge badge-primary" style="font-size: 0.55rem;">VPS</span>
+                    </div>
+                    <div class="controls-grid">
+                        <button class="control-btn start" id="btnStart" onclick="startServer()" {% if not files %}disabled{% endif %}>
+                            <span class="icon"><i class="fas fa-play"></i></span> Start
+                        </button>
+                        <button class="control-btn stop" id="btnStop" onclick="stopServer()" {% if not running %}disabled{% endif %}>
+                            <span class="icon"><i class="fas fa-stop"></i></span> Stop
+                        </button>
+                        <button class="control-btn restart" id="btnRestart" onclick="restartServer()" {% if not running %}disabled{% endif %}>
+                            <span class="icon"><i class="fas fa-sync-alt"></i></span> Restart
+                        </button>
+                        <button class="control-btn clear" id="btnClear" onclick="clearServer()">
+                            <span class="icon"><i class="fas fa-trash-alt"></i></span> Clear
+                        </button>
+                    </div>
+                    <div class="server-status">
+                        <span class="status-dot {% if running %}on{% else %}off{% endif %}" id="statusDot"></span>
+                        <div class="status-info">
+                            <div class="status-label">Server Status</div>
+                            <div class="status-file" id="statusFile">
+                                {% if running %}{{ running_file }}{% else %}No process running{% endif %}
+                            </div>
+                        </div>
+                        <button class="btn btn-ghost btn-sm" onclick="fetchLogs()" title="Refresh logs">
+                            <i class="fas fa-sync-alt" style="font-size: 0.7rem;"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Logs Card -->
+                <div class="dashboard-card" style="flex: 1;">
+                    <div class="card-header">
+                        <h3><i class="fas fa-terminal" style="color: #00ff88;"></i> Real-time Logs</h3>
+                        <div class="card-actions">
+                            <span class="badge badge-success" style="font-size: 0.5rem; padding: 2px 8px;">
+                                <i class="fas fa-circle" style="font-size: 5px;"></i> LIVE
+                            </span>
+                            <button class="btn btn-ghost btn-sm" onclick="clearLogs()" title="Clear logs">
+                                <i class="fas fa-eraser" style="font-size: 0.7rem;"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="logs-container">
+                        <div class="logs-header">
+                            <div class="logs-title">
+                                <span class="dot live"></span>
+                                Output Stream
+                            </div>
+                            <div class="logs-actions">
+                                <button class="btn" onclick="toggleAutoScroll()" id="scrollToggle">
+                                    <i class="fas fa-arrow-down"></i> Auto
+                                </button>
+                                <button class="btn" onclick="downloadLogs()">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="logs-body" id="logsBody">
+                            <div class="log-empty">Waiting for output...</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================
+SCRIPTS
+=============================================================== -->
+<script>
+    // ============================================================
+    // SECTION 1: STATE VARIABLES
+    // ============================================================
+    let autoScroll = true;
+    let logInterval = null;
+    let isRunning = {{ running|tojson }};
+    let currentFile = "{{ running_file or '' }}";
+    let logsData = [];
+    let installLogsData = [];
+
+    // ============================================================
+    // SECTION 2: EXPIRY COUNTDOWN
+    // ============================================================
+    {% if expires_at %}
+    function updateCountdown() {
+        const now = Date.now() / 1000;
+        const remaining = {{ expires_at }} - now;
+        const el = document.getElementById('expiryCountdown');
+        if (el && remaining > 0) {
+            const hours = remaining / 3600;
+            if (hours > 24) {
+                el.textContent = (hours / 24).toFixed(1) + 'd';
+            } else if (hours > 1) {
+                el.textContent = hours.toFixed(1) + 'h';
+            } else {
+                const mins = remaining / 60;
+                el.textContent = Math.ceil(mins) + 'm';
+            }
+        } else if (el) {
+            el.textContent = 'Expired';
+            el.style.color = '#ff0044';
+        }
+    }
+    setInterval(updateCountdown, 30000);
+    updateCountdown();
+    {% endif %}
+
+    // ============================================================
+    // SECTION 3: FILE OPERATIONS
+    // ============================================================
+    function startFile(filename) {
+        if (!filename) {
+            showToast('⚠️ No file selected', 'warning');
+            return;
+        }
+        const fd = new FormData();
+        fd.append('file', filename);
+        showToast('🚀 Starting ' + filename + '...', 'info');
+        
+        fetch('/server/start', { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(data => {
+                if (data.ok) {
+                    showToast('✅ ' + filename + ' started!', 'success');
+                    setTimeout(() => location.reload(), 600);
+                } else {
+                    showToast('❌ ' + (data.msg || 'Failed to start'), 'error');
+                }
+            })
+            .catch(err => showToast('❌ Network error: ' + err.message, 'error'));
+    }
+
+    // ============================================================
+    // SECTION 4: SERVER CONTROLS
+    // ============================================================
+    function startServer() {
+        const fileInput = document.querySelector('#fileList .file-item:first-child .file-name');
+        if (!fileInput) {
+            showToast('⚠️ No files available to run', 'warning');
+            return;
+        }
+        const filename = fileInput.textContent.trim();
+        startFile(filename);
+    }
+
+    function stopServer() {
+        if (!isRunning) {
+            showToast('⚠️ No process running', 'warning');
+            return;
+        }
+        showToast('⏹ Stopping server...', 'info');
+        fetch('/server/stop', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                showToast('✅ Server stopped', 'success');
+                setTimeout(() => location.reload(), 500);
+            })
+            .catch(err => showToast('❌ Error: ' + err.message, 'error'));
+    }
+
+    function restartServer() {
+        if (!isRunning) {
+            showToast('⚠️ No process running to restart', 'warning');
+            return;
+        }
+        showToast('🔄 Restarting server...', 'info');
+        fetch('/server/restart', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.ok) {
+                    showToast('✅ Server restarted!', 'success');
+                    setTimeout(() => location.reload(), 600);
+                } else {
+                    showToast('❌ ' + (data.msg || 'Restart failed'), 'error');
+                }
+            })
+            .catch(err => showToast('❌ Error: ' + err.message, 'error'));
+    }
+
+    function clearServer() {
+        if (!confirm('⚠️ Stop and clear the current process?')) return;
+        showToast('🗑 Clearing process...', 'info');
+        fetch('/server/delete', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                showToast('✅ Process cleared', 'success');
+                setTimeout(() => location.reload(), 500);
+            })
+            .catch(err => showToast('❌ Error: ' + err.message, 'error'));
+    }
+
+    // ============================================================
+    // SECTION 5: INSTALL MODULE
+    // ============================================================
+    function doInstall(e) {
+        e.preventDefault();
+        const cmd = document.getElementById('installCmd');
+        const btn = document.getElementById('installBtn');
+        const value = cmd.value.trim();
+        
+        if (!value) {
+            showToast('⚠️ Please enter a command', 'warning');
+            return;
+        }
+        
+        // Validate command
+        if (!value.startsWith('pip install ') && !value.startsWith('npm install ')) {
+            showToast('⚠️ Only pip install or npm install allowed', 'error');
+            return;
+        }
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Installing...';
+        
+        const fd = new FormData();
+        fd.append('command', value);
+        
+        showToast('📦 Installing ' + value.replace(/^(pip|npm) install /, '') + '...', 'info');
+        
+        fetch('/install', { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(data => {
+                if (data.ok) {
+                    showToast('✅ Installation started!', 'success');
+                } else {
+                    showToast('❌ ' + (data.msg || 'Installation failed'), 'error');
+                }
+                cmd.value = '';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-download"></i> Install';
+            })
+            .catch(err => {
+                showToast('❌ Network error: ' + err.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-download"></i> Install';
+            });
+        
+        return false;
+    }
+
+    // ============================================================
+    // SECTION 6: LOGS FETCHING
+    // ============================================================
+    function fetchLogs() {
+        fetch('/logs')
+            .then(r => r.json())
+            .then(data => {
+                // Update logs
+                if (data.logs && data.logs.length > 0) {
+                    logsData = data.logs;
+                    renderLogs(data.logs);
+                }
+                
+                // Update install logs
+                if (data.install && data.install.length > 0) {
+                    installLogsData = data.install;
+                    renderInstallLogs(data.install);
+                }
+                
+                // Update status
+                isRunning = data.running || false;
+                updateStatus(data.running, data.file);
+            })
+            .catch(err => console.error('Log fetch error:', err));
+    }
+
+    function renderLogs(logs) {
+        const body = document.getElementById('logsBody');
+        if (!body) return;
+        
+        if (!logs || logs.length === 0) {
+            body.innerHTML = '<div class="log-empty">Waiting for output...</div>';
+            return;
+        }
+        
+        const atBottom = body.scrollTop + body.clientHeight >= body.scrollHeight - 20;
+        
+        let html = '';
+        logs.forEach(line => {
+            const escaped = escapeHtml(line);
+            let className = '';
+            if (escaped.includes('[error]') || escaped.includes('[ERROR]') || escaped.includes('Error')) {
+                className = 'log-error';
+            } else if (escaped.includes('[warn]') || escaped.includes('[WARN]')) {
+                className = 'log-warn';
+            } else if (escaped.includes('[info]') || escaped.includes('[INFO]')) {
+                className = 'log-info';
+            } else if (escaped.includes('[ok]') || escaped.includes('[OK]') || escaped.includes('[start]')) {
+                className = 'log-ok';
+            }
+            html += `<div class="log-line ${className}">${escaped}</div>`;
+        });
+        
+        body.innerHTML = html;
+        
+        if (autoScroll && atBottom) {
+            body.scrollTop = body.scrollHeight;
+        }
+    }
+
+    function renderInstallLogs(logs) {
+        const container = document.getElementById('installLogs');
+        if (!container) return;
+        
+        if (!logs || logs.length === 0) {
+            container.innerHTML = '<div class="install-empty">Waiting for installation...</div>';
+            return;
+        }
+        
+        let html = '';
+        logs.forEach(line => {
+            const escaped = escapeHtml(line);
+            html += `<div>${escaped}</div>`;
+        });
+        container.innerHTML = html;
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function updateStatus(running, file) {
+        isRunning = running;
+        currentFile = file || '';
+        
+        // Update badge
+        const badge = document.getElementById('statusBadge');
+        if (badge) {
+            if (running) {
+                badge.className = 'status-badge running';
+                badge.innerHTML = '<i class="fas fa-circle" style="font-size: 6px;"></i> Running';
+            } else {
+                badge.className = 'status-badge stopped';
+                badge.innerHTML = '<i class="fas fa-circle" style="font-size: 6px;"></i> Stopped';
+            }
+        }
+        
+        // Update dot
+        const dot = document.getElementById('statusDot');
+        if (dot) {
+            dot.className = 'status-dot ' + (running ? 'on' : 'off');
+        }
+        
+        // Update status file
+        const statusFile = document.getElementById('statusFile');
+        if (statusFile) {
+            statusFile.textContent = running ? file || 'Running' : 'No process running';
+        }
+        
+        // Update buttons
+        const btnStart = document.getElementById('btnStart');
+        const btnStop = document.getElementById('btnStop');
+        const btnRestart = document.getElementById('btnRestart');
+        
+        if (btnStart) btnStart.disabled = running;
+        if (btnStop) btnStop.disabled = !running;
+        if (btnRestart) btnRestart.disabled = !running;
+    }
+
+    // ============================================================
+    // SECTION 7: LOGS CONTROLS
+    // ============================================================
+    function clearLogs() {
+        const body = document.getElementById('logsBody');
+        if (body) {
+            body.innerHTML = '<div class="log-empty">Logs cleared...</div>';
+        }
+        logsData = [];
+    }
+
+    function toggleAutoScroll() {
+        autoScroll = !autoScroll;
+        const btn = document.getElementById('scrollToggle');
+        if (btn) {
+            btn.innerHTML = autoScroll ? '<i class="fas fa-arrow-down"></i> Auto' : '<i class="fas fa-pause"></i> Paused';
+        }
+        if (autoScroll) {
+            const body = document.getElementById('logsBody');
+            if (body) body.scrollTop = body.scrollHeight;
+        }
+    }
+
+    function downloadLogs() {
+        const body = document.getElementById('logsBody');
+        if (!body) return;
+        const content = body.textContent || 'No logs available';
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `logs_${new Date().toISOString().slice(0,10)}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('📥 Logs downloaded!', 'success');
+    }
+
+    // ============================================================
+    // SECTION 8: UPLOAD PROGRESS
+    // ============================================================
+    document.getElementById('fileInput')?.addEventListener('change', function() {
+        const progress = document.getElementById('uploadProgress');
+        const fill = document.getElementById('uploadFill');
+        const text = document.getElementById('uploadText');
+        
+        if (this.files && this.files.length > 0) {
+            progress.style.display = 'block';
+            let uploaded = 0;
+            const total = this.files.length;
+            
+            // Simulate progress
+            const interval = setInterval(() => {
+                uploaded += 5;
+                if (uploaded >= 100) {
+                    uploaded = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        progress.style.display = 'none';
+                        fill.style.width = '0%';
+                        text.textContent = '0%';
+                        showToast('✅ Files uploaded!', 'success');
+                    }, 500);
+                }
+                fill.style.width = uploaded + '%';
+                text.textContent = Math.min(uploaded, 100) + '%';
+            }, 100);
+        }
+    });
+
+    // ============================================================
+    // SECTION 9: DRAG & DROP UPLOAD
+    // ============================================================
+    const uploadZone = document.getElementById('uploadZone');
+    if (uploadZone) {
+        uploadZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+        
+        uploadZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+        });
+        
+        uploadZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const input = document.getElementById('fileInput');
+                const dt = new DataTransfer();
+                for (const f of files) dt.items.add(f);
+                input.files = dt.files;
+                document.getElementById('uploadForm').submit();
+            }
+        });
+    }
+
+    // ============================================================
+    // SECTION 10: AUTO-REFRESH LOGS
+    // ============================================================
+    function startLogPolling() {
+        fetchLogs();
+        if (logInterval) clearInterval(logInterval);
+        logInterval = setInterval(fetchLogs, 1500);
+    }
+
+    function stopLogPolling() {
+        if (logInterval) {
+            clearInterval(logInterval);
+            logInterval = null;
+        }
+    }
+
+    // ============================================================
+    // SECTION 11: KEYBOARD SHORTCUTS
+    // ============================================================
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+Enter = start server
+        if (e.ctrlKey && e.key === 'Enter') {
+            e.preventDefault();
+            startServer();
+        }
+        // Ctrl+Shift+S = stop server
+        if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+            e.preventDefault();
+            stopServer();
+        }
+        // Ctrl+Shift+R = restart server
+        if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+            e.preventDefault();
+            restartServer();
+        }
+        // Ctrl+L = focus logs (scroll to bottom)
+        if (e.ctrlKey && e.key === 'l') {
+            e.preventDefault();
+            const body = document.getElementById('logsBody');
+            if (body) body.scrollTop = body.scrollHeight;
+        }
+        // Escape = clear search/input focus
+        if (e.key === 'Escape') {
+            const active = document.activeElement;
+            if (active && active.closest('input')) {
+                active.blur();
+            }
+        }
+    });
+
+    // ============================================================
+    // SECTION 12: CONSOLE WELCOME
+    // ============================================================
+    console.log('%c🖥️ SasiVPS User Dashboard', 'font-size: 20px; font-weight: 800; color: #00ff88; text-shadow: 0 0 20px rgba(0,255,136,0.2);');
+    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #444444;');
+    console.log('%c  👤 User: {{ username }}', 'font-size: 13px; color: #8892bf;');
+    console.log('%c  📁 Files: {{ files|length }}', 'font-size: 13px; color: #8892bf;');
+    console.log('%c  🟢 Status: ' + ({{ running|tojson }} ? 'Running' : 'Stopped'), 'font-size: 13px; color: ' + ({{ running|tojson }} ? '#00ff88' : '#666666') + ';');
+    console.log('%c  ⌨️  Shortcuts:', 'font-size: 12px; font-weight: 600; color: #5a6a8a;');
+    console.log('%c     Ctrl+Enter   → Start Server', 'font-size: 12px; color: #5a6a8a;');
+    console.log('%c     Ctrl+Shift+S → Stop Server', 'font-size: 12px; color: #5a6a8a;');
+    console.log('%c     Ctrl+Shift+R → Restart Server', 'font-size: 12px; color: #5a6a8a;');
+    console.log('%c     Ctrl+L       → Scroll logs to bottom', 'font-size: 12px; color: #5a6a8a;');
+    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #444444;');
+    console.log('%c🚀 Happy coding!', 'font-size: 14px; font-weight: 600; color: #00d4ff;');
+
+    // ============================================================
+    // SECTION 13: INIT
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        // Start log polling
+        startLogPolling();
+        
+        // Check for any flash messages
+        const flashMsg = sessionStorage.getItem('flash');
+        if (flashMsg) {
+            try {
+                const data = JSON.parse(flashMsg);
+                showToast(data.message, data.type || 'info');
+            } catch(e) {}
+            sessionStorage.removeItem('flash');
+        }
+        
+        // Auto-scroll logs initially
+        const body = document.getElementById('logsBody');
+        if (body && autoScroll) {
+            setTimeout(() => body.scrollTop = body.scrollHeight, 500);
+        }
+        
+        // Focus on install input after a delay
+        setTimeout(() => {
+            const installInput = document.getElementById('installCmd');
+            if (installInput) installInput.focus();
+        }, 1000);
+    });
+
+    // ============================================================
+    // SECTION 14: NETWORK STATUS
+    // ============================================================
+    window.addEventListener('online', () => {
+        showToast('🟢 Back online!', 'success');
+        fetchLogs();
+    });
+
+    window.addEventListener('offline', () => {
+        showToast('🔴 You are offline. Check your connection.', 'error');
+    });
+
+    // ============================================================
+    // SECTION 15: EXPOSE GLOBALS
+    // ============================================================
+    window.startFile = startFile;
+    window.startServer = startServer;
+    window.stopServer = stopServer;
+    window.restartServer = restartServer;
+    window.clearServer = clearServer;
+    window.doInstall = doInstall;
+    window.fetchLogs = fetchLogs;
+    window.clearLogs = clearLogs;
+    window.toggleAutoScroll = toggleAutoScroll;
+    window.downloadLogs = downloadLogs;
+
+    console.log('%c✅ Dashboard ready!', 'font-size: 13px; color: #00ff88;');
+</script>
+{% endblock %}

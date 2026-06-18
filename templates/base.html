@@ -1,0 +1,1578 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SasiVPS - Professional VPS Hosting Panel">
+    <meta name="theme-color" content="#00ff88">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="SasiVPS — Professional VPS Hosting">
+    <meta property="og:description" content="Run your code on a real VPS in seconds">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>{% block title %}SasiVPS — Professional VPS Hosting Panel{% endblock %}</title>
+    
+    <!-- ===== FONTS ===== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- ===== FONT AWESOME ===== -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    {% block head %}{% endblock %}
+    
+    <style>
+        /* ================================================================
+                   SECTION 1: CSS VARIABLES — BLACK + NEON THEME
+                   ================================================================ */
+        :root {
+            /* ----- Core Colors ----- */
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            --bg-tertiary: #111111;
+            --bg-quaternary: #1a1a1a;
+            --bg-card: rgba(10, 10, 10, 0.92);
+            --bg-card-hover: rgba(20, 20, 20, 0.95);
+            --bg-card-solid: #0d0d0d;
+            --bg-input: rgba(0, 0, 0, 0.85);
+            --bg-input-hover: rgba(10, 10, 10, 0.95);
+            --bg-dropdown: #0d0d0d;
+            --bg-tooltip: #0d0d0d;
+            --bg-modal: rgba(0, 0, 0, 0.92);
+            --bg-skeleton: rgba(0, 255, 136, 0.06);
+            
+            /* ----- Neon Colors ----- */
+            --neon-green: #00ff88;
+            --neon-green-dim: rgba(0, 255, 136, 0.15);
+            --neon-green-glow: rgba(0, 255, 136, 0.30);
+            --neon-blue: #00d4ff;
+            --neon-blue-dim: rgba(0, 212, 255, 0.15);
+            --neon-blue-glow: rgba(0, 212, 255, 0.30);
+            --neon-pink: #ff2d95;
+            --neon-pink-dim: rgba(255, 45, 149, 0.15);
+            --neon-pink-glow: rgba(255, 45, 149, 0.30);
+            --neon-purple: #b44dff;
+            --neon-purple-dim: rgba(180, 77, 255, 0.15);
+            --neon-purple-glow: rgba(180, 77, 255, 0.30);
+            --neon-yellow: #ffe600;
+            --neon-yellow-dim: rgba(255, 230, 0, 0.15);
+            --neon-yellow-glow: rgba(255, 230, 0, 0.30);
+            --neon-orange: #ff6b00;
+            --neon-orange-dim: rgba(255, 107, 0, 0.15);
+            --neon-orange-glow: rgba(255, 107, 0, 0.30);
+            --neon-red: #ff0044;
+            --neon-red-dim: rgba(255, 0, 68, 0.15);
+            --neon-red-glow: rgba(255, 0, 68, 0.30);
+            
+            /* ----- Borders ----- */
+            --border-color: rgba(0, 255, 136, 0.08);
+            --border-hover: rgba(0, 255, 136, 0.20);
+            --border-active: rgba(0, 255, 136, 0.40);
+            --border-focus: rgba(0, 255, 136, 0.50);
+            --border-neon: rgba(0, 255, 136, 0.25);
+            
+            /* ----- Text ----- */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+            --text-dimmed: #444444;
+            --text-inverse: #000000;
+            --text-link: #00ff88;
+            --text-link-hover: #66ffbb;
+            
+            /* ----- Accents ----- */
+            --accent-primary: #00ff88;
+            --accent-primary-dark: #00cc6a;
+            --accent-primary-light: #66ffbb;
+            --accent-secondary: #00d4ff;
+            --accent-tertiary: #ff2d95;
+            --accent-cyan: #00d4ff;
+            --accent-blue: #0088ff;
+            --accent-purple: #b44dff;
+            --accent-pink: #ff2d95;
+            
+            /* ----- Status Colors ----- */
+            --color-success: #00ff88;
+            --color-success-bg: rgba(0, 255, 136, 0.10);
+            --color-success-border: rgba(0, 255, 136, 0.25);
+            --color-warning: #ffe600;
+            --color-warning-bg: rgba(255, 230, 0, 0.10);
+            --color-warning-border: rgba(255, 230, 0, 0.25);
+            --color-danger: #ff0044;
+            --color-danger-bg: rgba(255, 0, 68, 0.10);
+            --color-danger-border: rgba(255, 0, 68, 0.25);
+            --color-info: #00d4ff;
+            --color-info-bg: rgba(0, 212, 255, 0.10);
+            --color-info-border: rgba(0, 212, 255, 0.25);
+            
+            /* ----- Gradients (Neon) ----- */
+            --gradient-main: linear-gradient(135deg, #00ff88 0%, #00d4ff 50%, #b44dff 100%);
+            --gradient-cyan: linear-gradient(135deg, #00d4ff 0%, #0088ff 100%);
+            --gradient-success: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+            --gradient-warning: linear-gradient(135deg, #ffe600 0%, #ffaa00 100%);
+            --gradient-danger: linear-gradient(135deg, #ff0044 0%, #cc0033 100%);
+            --gradient-gold: linear-gradient(135deg, #ffe600 0%, #ffaa00 50%, #ffe600 100%);
+            --gradient-purple: linear-gradient(135deg, #b44dff 0%, #7c3aed 100%);
+            --gradient-pink: linear-gradient(135deg, #ff2d95 0%, #cc0066 100%);
+            --gradient-rainbow: linear-gradient(135deg, #ff0044, #ff6b00, #ffe600, #00ff88, #00d4ff, #b44dff, #ff2d95);
+            --gradient-neon: linear-gradient(135deg, #00ff88, #00d4ff, #b44dff, #ff2d95, #ff6b00, #ffe600, #00ff88);
+            
+            /* ----- Shadows (Neon Glow) ----- */
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.80);
+            --shadow-card-hover: 0 16px 56px rgba(0, 0, 0, 0.90);
+            --shadow-glow: 0 0 30px rgba(0, 255, 136, 0.15), 0 0 60px rgba(0, 255, 136, 0.05);
+            --shadow-glow-strong: 0 0 40px rgba(0, 255, 136, 0.25), 0 0 80px rgba(0, 255, 136, 0.08);
+            --shadow-dropdown: 0 16px 48px rgba(0, 0, 0, 0.90);
+            --shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.95);
+            --shadow-tooltip: 0 8px 24px rgba(0, 0, 0, 0.80);
+            --shadow-focus: 0 0 0 4px rgba(0, 255, 136, 0.15), 0 0 20px rgba(0, 255, 136, 0.10);
+            
+            /* ----- Spacing ----- */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-2xl: 48px;
+            --spacing-3xl: 64px;
+            
+            /* ----- Radius ----- */
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-2xl: 32px;
+            --radius-full: 9999px;
+            
+            /* ----- Transitions ----- */
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            
+            /* ----- Fonts ----- */
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+            
+            /* ----- Sizes ----- */
+            --nav-height: 68px;
+            --footer-height: 56px;
+            --max-width: 1200px;
+            --content-padding: 24px;
+        }
+
+        /* ================================================================
+                   SECTION 2: LIGHT THEME (Dark + Neon adaptation)
+                   ================================================================ */
+        [data-theme="light"] {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #121212;
+            --bg-tertiary: #1a1a1a;
+            --bg-quaternary: #222222;
+            --bg-card: rgba(18, 18, 18, 0.92);
+            --bg-card-hover: rgba(26, 26, 26, 0.95);
+            --bg-card-solid: #0d0d0d;
+            --bg-input: rgba(0, 0, 0, 0.85);
+            --bg-input-hover: rgba(10, 10, 10, 0.95);
+            --bg-dropdown: #0d0d0d;
+            --bg-tooltip: #0d0d0d;
+            --bg-modal: rgba(0, 0, 0, 0.92);
+            
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #777777;
+            --text-dimmed: #555555;
+            
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.90);
+            --shadow-card-hover: 0 16px 56px rgba(0, 0, 0, 0.95);
+            --shadow-dropdown: 0 16px 48px rgba(0, 0, 0, 0.95);
+            --shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.98);
+        }
+
+        /* ================================================================
+                   SECTION 3: RESET & BASE STYLES
+                   ================================================================ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            background-image:
+                radial-gradient(ellipse at 10% 20%, rgba(0, 255, 136, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(0, 212, 255, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(180, 77, 255, 0.02) 0%, transparent 70%),
+                linear-gradient(180deg, var(--bg-primary), var(--bg-secondary));
+            background-attachment: fixed;
+            transition: background var(--transition-slow), color var(--transition-slow);
+            line-height: 1.6;
+        }
+
+        /* Neon scan line effect */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            background: repeating-linear-gradient(0deg,
+                transparent 0px,
+                transparent 2px,
+                rgba(0, 255, 136, 0.01) 2px,
+                rgba(0, 255, 136, 0.01) 3px);
+            opacity: 0.3;
+        }
+
+        /* ================================================================
+                   SECTION 4: TYPOGRAPHY
+                   ================================================================ */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.2;
+            margin: 0 0 0.5em 0;
+            color: var(--text-primary);
+        }
+
+        h1 { font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.03em; }
+        h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); letter-spacing: -0.02em; }
+        h3 { font-size: clamp(1.125rem, 2vw, 1.5rem); letter-spacing: -0.01em; }
+        h4 { font-size: clamp(1rem, 1.5vw, 1.25rem); }
+        h5 { font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+        h6 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dimmed); }
+
+        p { margin: 0 0 1em 0; color: var(--text-secondary); }
+
+        a {
+            color: var(--text-link);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+        a:hover { color: var(--text-link-hover); }
+
+        code, kbd, samp, pre {
+            font-family: var(--font-mono);
+            font-size: 0.875em;
+        }
+
+        code {
+            background: rgba(0, 255, 136, 0.08);
+            color: #00ff88;
+            padding: 0.125em 0.375em;
+            border-radius: var(--radius-sm);
+            font-size: 0.85em;
+            border: 1px solid rgba(0, 255, 136, 0.10);
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.60);
+            color: #66ffbb;
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            overflow: auto;
+            border: 1px solid rgba(0, 255, 136, 0.08);
+            font-size: 0.8rem;
+            line-height: 1.5;
+            max-height: 400px;
+        }
+
+        /* ================================================================
+                   SECTION 5: SCROLLBAR — NEON STYLING
+                   ================================================================ */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 136, 0.25);
+            border-radius: var(--radius-full);
+            transition: background var(--transition-fast);
+        }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 255, 136, 0.50); }
+
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 255, 136, 0.25) transparent;
+        }
+
+        /* ================================================================
+                   SECTION 6: UTILITY CLASSES
+                   ================================================================ */
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 var(--content-padding);
+            width: 100%;
+        }
+
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .flex-between { display: flex; align-items: center; justify-content: space-between; }
+        .flex-wrap { flex-wrap: wrap; }
+        .gap-sm { gap: var(--spacing-sm); }
+        .gap-md { gap: var(--spacing-md); }
+        .gap-lg { gap: var(--spacing-lg); }
+        .gap-xl { gap: var(--spacing-xl); }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-md); }
+
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-muted { color: var(--text-muted); }
+        .text-secondary { color: var(--text-secondary); }
+        .text-gradient {
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .text-gradient-cyan {
+            background: var(--gradient-cyan);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .text-gradient-gold {
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .text-neon-green { color: #00ff88; }
+        .text-neon-blue { color: #00d4ff; }
+        .text-neon-pink { color: #ff2d95; }
+        .text-neon-purple { color: #b44dff; }
+        .text-neon-yellow { color: #ffe600; }
+
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .sticky { position: sticky; }
+
+        .mt-sm { margin-top: var(--spacing-sm); }
+        .mt-md { margin-top: var(--spacing-md); }
+        .mt-lg { margin-top: var(--spacing-lg); }
+        .mt-xl { margin-top: var(--spacing-xl); }
+        .mb-sm { margin-bottom: var(--spacing-sm); }
+        .mb-md { margin-bottom: var(--spacing-md); }
+        .mb-lg { margin-bottom: var(--spacing-lg); }
+        .mb-xl { margin-bottom: var(--spacing-xl); }
+
+        .p-sm { padding: var(--spacing-sm); }
+        .p-md { padding: var(--spacing-md); }
+        .p-lg { padding: var(--spacing-lg); }
+        .p-xl { padding: var(--spacing-xl); }
+
+        .rounded-sm { border-radius: var(--radius-sm); }
+        .rounded-md { border-radius: var(--radius-md); }
+        .rounded-lg { border-radius: var(--radius-lg); }
+        .rounded-xl { border-radius: var(--radius-xl); }
+        .rounded-full { border-radius: var(--radius-full); }
+
+        .hidden { display: none !important; }
+        .block { display: block; }
+        .inline-block { display: inline-block; }
+
+        /* ================================================================
+                   SECTION 7: GLASS + NEON CARDS
+                   ================================================================ */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 255, 136, 0.08);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-card);
+            transition: all var(--transition-normal);
+        }
+        .card:hover {
+            background: var(--bg-card-hover);
+            box-shadow: var(--shadow-card-hover), var(--shadow-glow);
+            border-color: rgba(0, 255, 136, 0.15);
+            transform: translateY(-2px);
+        }
+        .card-solid {
+            background: var(--bg-card-solid);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        .card-neon {
+            border-color: rgba(0, 255, 136, 0.15);
+            box-shadow: var(--shadow-card), var(--shadow-glow);
+        }
+        .card-neon:hover {
+            border-color: rgba(0, 255, 136, 0.30);
+            box-shadow: var(--shadow-card-hover), var(--shadow-glow-strong);
+        }
+        .card-border-glow {
+            border-color: rgba(0, 255, 136, 0.20);
+            box-shadow: var(--shadow-glow);
+        }
+        .card-border-glow:hover {
+            border-color: rgba(0, 255, 136, 0.40);
+            box-shadow: var(--shadow-glow-strong);
+        }
+
+        /* ================================================================
+                   SECTION 8: BUTTONS — NEON
+                   ================================================================ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            text-decoration: none;
+            white-space: nowrap;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-primary {
+            background: var(--gradient-main);
+            color: #000000;
+            box-shadow: var(--shadow-glow);
+            font-weight: 700;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow-strong);
+        }
+
+        .btn-secondary {
+            background: var(--gradient-cyan);
+            color: #000000;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.15);
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.25);
+        }
+
+        .btn-success {
+            background: var(--gradient-success);
+            color: #000000;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.15);
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.25);
+        }
+
+        .btn-warning {
+            background: var(--gradient-warning);
+            color: #000000;
+            box-shadow: 0 0 30px rgba(255, 230, 0, 0.15);
+        }
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(255, 230, 0, 0.25);
+        }
+
+        .btn-danger {
+            background: var(--gradient-danger);
+            color: #ffffff;
+            box-shadow: 0 0 30px rgba(255, 0, 68, 0.15);
+        }
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(255, 0, 68, 0.25);
+        }
+
+        .btn-ghost {
+            background: rgba(0, 255, 136, 0.05);
+            color: var(--text-primary);
+            border: 1px solid rgba(0, 255, 136, 0.12);
+        }
+        .btn-ghost:hover {
+            background: rgba(0, 255, 136, 0.10);
+            border-color: rgba(0, 255, 136, 0.25);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-primary {
+            background: transparent;
+            color: #00ff88;
+            border: 2px solid #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.05);
+        }
+        .btn-outline-primary:hover {
+            background: #00ff88;
+            color: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.25);
+        }
+
+        .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: var(--radius-sm); }
+        .btn-lg { padding: 0.875rem 2rem; font-size: 1rem; border-radius: var(--radius-lg); }
+        .btn-xl { padding: 1rem 2.5rem; font-size: 1.125rem; border-radius: var(--radius-lg); }
+        .btn-icon { width: 2.5rem; height: 2.5rem; padding: 0; border-radius: var(--radius-full); font-size: 1.125rem; }
+        .btn-icon-sm { width: 2rem; height: 2rem; padding: 0; border-radius: var(--radius-full); font-size: 0.875rem; }
+
+        /* ================================================================
+                   SECTION 9: FORM ELEMENTS — NEON
+                   ================================================================ */
+        input, select, textarea {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid rgba(0, 255, 136, 0.10);
+            border-radius: var(--radius-md);
+            font-family: var(--font-sans);
+            font-size: 0.875rem;
+            transition: all var(--transition-fast);
+            outline: none;
+        }
+        input:hover, select:hover, textarea:hover {
+            background: var(--bg-input-hover);
+            border-color: rgba(0, 255, 136, 0.20);
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: rgba(0, 255, 136, 0.40);
+            box-shadow: var(--shadow-focus);
+            background: var(--bg-input-hover);
+        }
+        input::placeholder, textarea::placeholder { color: var(--text-muted); }
+        input:disabled, select:disabled, textarea:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300ff88' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .form-group { margin-bottom: var(--spacing-md); }
+        .form-group label { margin-bottom: var(--spacing-xs); }
+        .form-group .helper { font-size: 0.75rem; color: var(--text-muted); margin-top: var(--spacing-xs); }
+        .form-group .error { font-size: 0.75rem; color: var(--color-danger); margin-top: var(--spacing-xs); }
+
+        .form-row { display: flex; gap: var(--spacing-md); flex-wrap: wrap; }
+        .form-row>* { flex: 1; min-width: 150px; }
+
+        /* ================================================================
+                   SECTION 10: BADGES — NEON
+                   ================================================================ */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: 0.15rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            border: 1px solid transparent;
+            line-height: 1.6;
+            white-space: nowrap;
+        }
+        .badge-success {
+            background: var(--color-success-bg);
+            color: #00ff88;
+            border-color: rgba(0, 255, 136, 0.25);
+        }
+        .badge-warning {
+            background: var(--color-warning-bg);
+            color: #ffe600;
+            border-color: rgba(255, 230, 0, 0.25);
+        }
+        .badge-danger {
+            background: var(--color-danger-bg);
+            color: #ff0044;
+            border-color: rgba(255, 0, 68, 0.25);
+        }
+        .badge-info {
+            background: var(--color-info-bg);
+            color: #00d4ff;
+            border-color: rgba(0, 212, 255, 0.25);
+        }
+        .badge-primary {
+            background: rgba(0, 255, 136, 0.10);
+            color: #00ff88;
+            border-color: rgba(0, 255, 136, 0.20);
+        }
+        .badge-gradient {
+            background: var(--gradient-main);
+            color: #000000;
+            border-color: transparent;
+        }
+        .badge-neon-green { background: rgba(0, 255, 136, 0.12); color: #00ff88; border-color: rgba(0, 255, 136, 0.20); }
+        .badge-neon-blue { background: rgba(0, 212, 255, 0.12); color: #00d4ff; border-color: rgba(0, 212, 255, 0.20); }
+        .badge-neon-pink { background: rgba(255, 45, 149, 0.12); color: #ff2d95; border-color: rgba(255, 45, 149, 0.20); }
+        .badge-neon-purple { background: rgba(180, 77, 255, 0.12); color: #b44dff; border-color: rgba(180, 77, 255, 0.20); }
+        .badge-pulse { animation: pulse-badge 2s ease-in-out infinite; }
+
+        @keyframes pulse-badge {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ================================================================
+                   SECTION 11: NAVIGATION — NEON
+                   ================================================================ */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--content-padding);
+            height: var(--nav-height);
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.06);
+            transition: all var(--transition-normal);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-weight: 800;
+            font-size: 1.125rem;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        .navbar-brand .logo-icon {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: var(--radius-md);
+            background: var(--gradient-main);
+            display: grid;
+            place-items: center;
+            font-size: 1.125rem;
+            color: #000000;
+            box-shadow: var(--shadow-glow);
+        }
+        .navbar-brand:hover { color: var(--text-primary); }
+
+        .navbar-links {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+        .navbar-links a {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color var(--transition-fast);
+            position: relative;
+        }
+        .navbar-links a:hover { color: #00ff88; }
+        .navbar-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-main);
+            transition: width var(--transition-normal);
+            border-radius: var(--radius-full);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.30);
+        }
+        .navbar-links a:hover::after { width: 100%; }
+        .navbar-links a.active { color: #00ff88; }
+        .navbar-links a.active::after { width: 100%; }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        .navbar-user .avatar {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: var(--radius-full);
+            background: var(--gradient-main);
+            display: grid;
+            place-items: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #000000;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
+        }
+        .navbar-user .username {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .navbar-mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: var(--spacing-xs);
+        }
+
+        /* ================================================================
+                   SECTION 12: DROPDOWN — NEON
+                   ================================================================ */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + var(--spacing-sm));
+            right: 0;
+            min-width: 200px;
+            background: var(--bg-dropdown);
+            border: 1px solid rgba(0, 255, 136, 0.08);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-dropdown);
+            padding: var(--spacing-xs) 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px) scale(0.96);
+            transition: all var(--transition-normal);
+            z-index: 50;
+        }
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        .dropdown-menu a,
+        .dropdown-menu button {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            width: 100%;
+            padding: 0.5rem 1rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+            text-align: left;
+        }
+        .dropdown-menu a:hover,
+        .dropdown-menu button:hover {
+            background: rgba(0, 255, 136, 0.06);
+            color: #00ff88;
+        }
+        .dropdown-menu .divider {
+            height: 1px;
+            background: rgba(0, 255, 136, 0.06);
+            margin: var(--spacing-xs) 0;
+        }
+        .dropdown-menu .danger { color: #ff0044; }
+        .dropdown-menu .danger:hover {
+            background: rgba(255, 0, 68, 0.08);
+            color: #ff0044;
+        }
+
+        /* ================================================================
+                   SECTION 13: TOAST NOTIFICATIONS — NEON
+                   ================================================================ */
+        .toast-container {
+            position: fixed;
+            top: calc(var(--nav-height) + var(--spacing-md));
+            right: var(--spacing-md);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            max-width: 420px;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: auto;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius-md);
+            color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-card), 0 0 30px rgba(0, 255, 136, 0.05);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            animation: toast-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 255, 136, 0.08);
+        }
+        .toast-success {
+            background: rgba(0, 10, 5, 0.95);
+            border-color: rgba(0, 255, 136, 0.20);
+            box-shadow: var(--shadow-card), 0 0 40px rgba(0, 255, 136, 0.08);
+        }
+        .toast-error {
+            background: rgba(10, 0, 2, 0.95);
+            border-color: rgba(255, 0, 68, 0.20);
+            box-shadow: var(--shadow-card), 0 0 40px rgba(255, 0, 68, 0.08);
+        }
+        .toast-warning {
+            background: rgba(10, 8, 0, 0.95);
+            border-color: rgba(255, 230, 0, 0.20);
+            box-shadow: var(--shadow-card), 0 0 40px rgba(255, 230, 0, 0.08);
+        }
+        .toast-info {
+            background: rgba(0, 8, 10, 0.95);
+            border-color: rgba(0, 212, 255, 0.20);
+            box-shadow: var(--shadow-card), 0 0 40px rgba(0, 212, 255, 0.08);
+        }
+        .toast .toast-icon { font-size: 1.25rem; flex-shrink: 0; }
+        .toast .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.40);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: var(--spacing-xs);
+            transition: color var(--transition-fast);
+        }
+        .toast .toast-close:hover { color: #ffffff; }
+
+        @keyframes toast-in {
+            from { opacity: 0; transform: translateX(40px) scale(0.92); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        @keyframes toast-out {
+            from { opacity: 1; transform: translateX(0) scale(1); }
+            to { opacity: 0; transform: translateX(40px) scale(0.92); }
+        }
+        .toast-exit { animation: toast-out 0.3s ease forwards; }
+
+        /* ================================================================
+                   SECTION 14: MODAL — NEON
+                   ================================================================ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-modal);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-md);
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-normal);
+        }
+        .modal-overlay.show { opacity: 1; visibility: visible; }
+
+        .modal {
+            background: var(--bg-card-solid);
+            border: 1px solid rgba(0, 255, 136, 0.08);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            max-width: 560px;
+            width: 100%;
+            box-shadow: var(--shadow-modal), 0 0 60px rgba(0, 255, 136, 0.03);
+            transform: scale(0.92) translateY(20px);
+            transition: all var(--transition-normal);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-overlay.show .modal { transform: scale(1) translateY(0); }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-lg);
+        }
+        .modal-header h3 { margin: 0; }
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color var(--transition-fast);
+            padding: var(--spacing-xs);
+        }
+        .modal-close:hover { color: #ff0044; }
+
+        .modal-footer {
+            display: flex;
+            gap: var(--spacing-sm);
+            justify-content: flex-end;
+            margin-top: var(--spacing-lg);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid rgba(0, 255, 136, 0.06);
+        }
+
+        /* ================================================================
+                   SECTION 15: TABLE — NEON
+                   ================================================================ */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(0, 255, 136, 0.06);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        table thead { background: rgba(0, 255, 136, 0.03); }
+        table th {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.06);
+        }
+        table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.04);
+            color: var(--text-secondary);
+        }
+        table tbody tr { transition: background var(--transition-fast); }
+        table tbody tr:hover { background: rgba(0, 255, 136, 0.03); }
+        table tbody tr:last-child td { border-bottom: none; }
+        table .actions { display: flex; gap: var(--spacing-xs); flex-wrap: wrap; }
+
+        /* ================================================================
+                   SECTION 16: FOOTER — NEON
+                   ================================================================ */
+        .footer {
+            text-align: center;
+            padding: var(--spacing-xl) var(--content-padding);
+            color: var(--text-muted);
+            font-size: 0.8125rem;
+            border-top: 1px solid rgba(0, 255, 136, 0.04);
+            margin-top: var(--spacing-3xl);
+        }
+        .footer a { color: var(--text-secondary); }
+        .footer a:hover { color: #00ff88; }
+        .footer .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-lg);
+            flex-wrap: wrap;
+            margin-bottom: var(--spacing-md);
+        }
+        .footer .footer-heart { color: #ff0044; animation: pulse 2s ease-in-out infinite; }
+
+        /* ================================================================
+                   SECTION 17: ANIMATIONS
+                   ================================================================ */
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slide-in {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes scale-in {
+            from { opacity: 0; transform: scale(0.92); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes neon-pulse {
+            0%, 100% { text-shadow: 0 0 10px rgba(0, 255, 136, 0.30), 0 0 20px rgba(0, 255, 136, 0.10); }
+            50% { text-shadow: 0 0 20px rgba(0, 255, 136, 0.50), 0 0 40px rgba(0, 255, 136, 0.20), 0 0 60px rgba(0, 255, 136, 0.10); }
+        }
+        @keyframes glow-pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.05); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.15), 0 0 80px rgba(0, 255, 136, 0.05); }
+        }
+
+        .animate-fade-in { animation: fade-in 0.5s ease-out; }
+        .animate-slide-in { animation: slide-in 0.4s ease-out; }
+        .animate-scale-in { animation: scale-in 0.4s ease-out; }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+        .animate-pulse { animation: pulse 2s ease-in-out infinite; }
+        .animate-spin { animation: spin 1s linear infinite; }
+        .animate-neon-pulse { animation: neon-pulse 2s ease-in-out infinite; }
+        .animate-glow-pulse { animation: glow-pulse 3s ease-in-out infinite; }
+
+        .shimmer {
+            background: linear-gradient(90deg, var(--bg-skeleton) 25%, rgba(0, 255, 136, 0.03) 50%, var(--bg-skeleton) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+
+        /* ================================================================
+                   SECTION 18: RESPONSIVE
+                   ================================================================ */
+        @media (max-width: 1024px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            :root { --content-padding: 16px; --nav-height: 60px; }
+
+            .navbar-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: var(--nav-height);
+                left: 0;
+                right: 0;
+                background: var(--bg-card-solid);
+                border-bottom: 1px solid rgba(0, 255, 136, 0.06);
+                padding: var(--spacing-md);
+                gap: var(--spacing-sm);
+                box-shadow: var(--shadow-card);
+            }
+            .navbar-links.open { display: flex; }
+            .navbar-mobile-toggle { display: block; }
+
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .form-row { flex-direction: column; }
+            .form-row>* { min-width: auto; }
+
+            .modal { padding: var(--spacing-md); margin: var(--spacing-sm); max-height: 95vh; }
+
+            .toast-container {
+                top: calc(var(--nav-height) + var(--spacing-sm));
+                right: var(--spacing-sm);
+                left: var(--spacing-sm);
+                max-width: none;
+            }
+
+            .card { padding: var(--spacing-md); }
+
+            table { font-size: 0.75rem; }
+            table th, table td { padding: 0.5rem 0.625rem; }
+
+            .btn { padding: 0.5rem 1rem; font-size: 0.8125rem; }
+            .btn-lg { padding: 0.625rem 1.25rem; font-size: 0.875rem; }
+            .btn-xl { padding: 0.75rem 1.5rem; font-size: 1rem; }
+        }
+
+        @media (max-width: 480px) {
+            .navbar-brand { font-size: 1rem; }
+            .navbar-brand .logo-icon { width: 1.75rem; height: 1.75rem; font-size: 0.875rem; }
+            .footer .footer-links { gap: var(--spacing-sm); flex-direction: column; }
+        }
+
+        /* ================================================================
+                   SECTION 19: PRINT
+                   ================================================================ */
+        @media print {
+            .navbar, .footer, .toast-container, .modal-overlay { display: none !important; }
+            body { background: #fff !important; color: #000 !important; }
+            .card { box-shadow: none !important; border: 1px solid #ddd !important; background: #fff !important; }
+        }
+
+        /* ================================================================
+                   SECTION 20: THEME TOGGLE — NEON
+                   ================================================================ */
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: var(--spacing-xs);
+            border-radius: var(--radius-full);
+            transition: all var(--transition-fast);
+            width: 2.25rem;
+            height: 2.25rem;
+            display: grid;
+            place-items: center;
+        }
+        .theme-toggle:hover {
+            background: rgba(0, 255, 136, 0.06);
+            color: #00ff88;
+        }
+
+        /* ================================================================
+                   SECTION 21: SKELETON LOADING
+                   ================================================================ */
+        .skeleton {
+            background: var(--bg-skeleton);
+            border-radius: var(--radius-sm);
+            min-height: 1.5rem;
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+        .skeleton-text { height: 0.875rem; margin-bottom: var(--spacing-sm); }
+        .skeleton-text:last-child { margin-bottom: 0; }
+        .skeleton-circle { width: 2.5rem; height: 2.5rem; border-radius: var(--radius-full); }
+        .skeleton-card { padding: var(--spacing-md); border-radius: var(--radius-md); }
+
+        /* ================================================================
+                   SECTION 22: NEON DIVIDER
+                   ================================================================ */
+        .neon-divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.20), #00ff88, rgba(0, 255, 136, 0.20), transparent);
+            margin: var(--spacing-xl) 0;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.05);
+        }
+
+        /* ================================================================
+                   SECTION 23: NEON GLOW TEXT
+                   ================================================================ */
+        .neon-glow-text {
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.20), 0 0 20px rgba(0, 255, 136, 0.10), 0 0 40px rgba(0, 255, 136, 0.05);
+        }
+
+        /* ================================================================
+                   SECTION 24: CARD HEADER WITH NEON BORDER
+                   ================================================================ */
+        .card-header-neon {
+            padding-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .card-header-neon h2, .card-header-neon h3 { margin: 0; }
+        .card-header-neon .badge { margin-left: var(--spacing-sm); }
+
+        /* ================================================================
+                   SECTION 25: STATUS INDICATOR
+                   ================================================================ */
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: var(--radius-full);
+            margin-right: var(--spacing-xs);
+        }
+        .status-dot.on { background: #00ff88; box-shadow: 0 0 10px rgba(0, 255, 136, 0.40); }
+        .status-dot.off { background: #444444; }
+        .status-dot.error { background: #ff0044; box-shadow: 0 0 10px rgba(255, 0, 68, 0.40); }
+        .status-dot.warning { background: #ffe600; box-shadow: 0 0 10px rgba(255, 230, 0, 0.40); }
+    </style>
+</head>
+<body>
+    <!-- ================================================================
+    SECTION 26: TOAST CONTAINER
+    ================================================================ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ================================================================
+    SECTION 27: NAVIGATION
+    ================================================================ -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <a href="/" class="navbar-brand">
+            <span class="logo-icon">
+                <i class="fas fa-bolt"></i>
+            </span>
+            <span>Sasi<span class="text-gradient">VPS</span></span>
+        </a>
+
+        <div class="navbar-links" id="navbarLinks">
+            <a href="/home" class="{% if request.path == '/home' %}active{% endif %}">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="/pricing" class="{% if request.path == '/pricing' %}active{% endif %}">
+                <i class="fas fa-tags"></i> Pricing
+            </a>
+            {% if session.username %}
+                <a href="/dashboard" class="{% if request.path == '/dashboard' %}active{% endif %}">
+                    <i class="fas fa-server"></i> Dashboard
+                </a>
+            {% endif %}
+            <div class="navbar-user">
+                {% if session.username %}
+                    <div class="avatar">{{ session.username[0]|upper }}</div>
+                    <span class="username">{{ session.username }}</span>
+                    <div class="dropdown">
+                        <button class="btn btn-ghost btn-sm" onclick="toggleDropdown(event)">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="userDropdown">
+                            <a href="/dashboard"><i class="fas fa-server"></i> Dashboard</a>
+                            <a href="/profile"><i class="fas fa-user"></i> Profile</a>
+                            <div class="divider"></div>
+                            <a href="/logout" class="danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="/login" class="btn btn-primary btn-sm">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                {% endif %}
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle" aria-label="Toggle theme">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+        </div>
+
+        <button class="navbar-mobile-toggle" onclick="toggleMobileNav()" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+
+    <!-- ================================================================
+    SECTION 28: MAIN CONTENT
+    ================================================================ -->
+    <main>
+        {% block body %}{% endblock %}
+    </main>
+
+    <!-- ================================================================
+    SECTION 29: FOOTER
+    ================================================================ -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-links">
+            <a href="/home"><i class="fas fa-home"></i> Home</a>
+            <a href="/pricing"><i class="fas fa-tags"></i> Pricing</a>
+            <a href="/dashboard"><i class="fas fa-server"></i> Dashboard</a>
+            <a href="#" onclick="showToast('Contact: telegram @sasi_vps', 'info')"><i class="fas fa-headset"></i> Support</a>
+            <a href="#" onclick="showToast('Coming soon! 🚀', 'info')"><i class="fas fa-code"></i> API</a>
+            <a href="#" onclick="showToast('GitHub: github.com/sasi/vps-panel', 'info')"><i class="fab fa-github"></i> GitHub</a>
+        </div>
+        <p>
+            <i class="fas fa-bolt" style="color: #00ff88;"></i>
+            &copy; 2026 <strong style="color: #00ff88;">SasiVPS</strong>
+            — Built with <i class="fas fa-heart footer-heart"></i> by <strong>Sasi</strong>
+            <br>
+            <span style="font-size: 0.75rem; color: var(--text-dimmed);">
+                <i class="fas fa-circle" style="color: #00ff88; font-size: 6px; display: inline-block; margin: 0 4px;"></i>
+                Powered by Railway
+                <i class="fas fa-circle" style="color: #00ff88; font-size: 6px; display: inline-block; margin: 0 4px;"></i>
+                All rights reserved
+            </span>
+        </p>
+    </footer>
+
+    <!-- ================================================================
+    SECTION 30: JAVASCRIPT
+    ================================================================ -->
+    <script>
+        // ============================================================
+        // SECTION 30.1: THEME TOGGLE
+        // ============================================================
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon(next);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('themeIcon');
+            if (icon) {
+                icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            }
+        }
+
+        // Load saved theme
+        (function loadTheme() {
+            const saved = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+            updateThemeIcon(saved);
+        })();
+
+        // ============================================================
+        // SECTION 30.2: MOBILE NAV
+        // ============================================================
+        function toggleMobileNav() {
+            const links = document.getElementById('navbarLinks');
+            links.classList.toggle('open');
+        }
+
+        document.querySelectorAll('#navbarLinks a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navbarLinks').classList.remove('open');
+            });
+        });
+
+        // ============================================================
+        // SECTION 30.3: DROPDOWN
+        // ============================================================
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            const menu = event.currentTarget.nextElementSibling;
+            menu.classList.toggle('show');
+        }
+
+        document.addEventListener('click', function(e) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (!menu.parentElement.contains(e.target)) {
+                    menu.classList.remove('show');
+                }
+            });
+        });
+
+        // ============================================================
+        // SECTION 30.4: TOAST SYSTEM
+        // ============================================================
+        function showToast(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-triangle-exclamation',
+                info: 'fa-info-circle'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <span class="toast-icon"><i class="fas ${icons[type] || icons.info}"></i></span>
+                <span>${message}</span>
+                <button class="toast-close" onclick="this.closest('.toast').remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.classList.add('toast-exit');
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, duration);
+
+            return toast;
+        }
+
+        // ============================================================
+        // SECTION 30.5: API REQUEST HELPER
+        // ============================================================
+        async function apiRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(options.headers || {})
+                    }
+                });
+                const data = await response.json();
+
+                if (data.ok === false) {
+                    showToast(data.msg || 'An error occurred', 'error');
+                } else if (data.ok === true && data.msg) {
+                    showToast(data.msg, 'success');
+                }
+
+                return data;
+            } catch (error) {
+                showToast('Network error: ' + error.message, 'error');
+                return { ok: false, msg: error.message };
+            }
+        }
+
+        // ============================================================
+        // SECTION 30.6: CLIPBOARD HELPER
+        // ============================================================
+        function copyToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text)
+                    .then(() => showToast('📋 Copied to clipboard!', 'success'))
+                    .catch(() => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const input = document.createElement('input');
+            input.value = text;
+            document.body.appendChild(input);
+            input.select();
+            try {
+                document.execCommand('copy');
+                showToast('📋 Copied to clipboard!', 'success');
+            } catch (e) {
+                showToast('Failed to copy', 'error');
+            }
+            input.remove();
+        }
+
+        // ============================================================
+        // SECTION 30.7: MODAL HELPERS
+        // ============================================================
+        function openModal(modalId) {
+            const overlay = document.getElementById(modalId);
+            if (overlay) {
+                overlay.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal(modalId) {
+            const overlay = document.getElementById(modalId);
+            if (overlay) {
+                overlay.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+
+        // ============================================================
+        // SECTION 30.8: KEYBOARD SHORTCUTS
+        // ============================================================
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.show').forEach(modal => {
+                    modal.classList.remove('show');
+                    document.body.style.overflow = '';
+                });
+                document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+
+            if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+                e.preventDefault();
+                toggleTheme();
+            }
+
+            if (e.ctrlKey && e.key === 'k') {
+                e.preventDefault();
+                showToast('🔍 Search feature coming soon!', 'info');
+            }
+        });
+
+        // ============================================================
+        // SECTION 30.9: CONSOLE WELCOME
+        // ============================================================
+        console.log('%c⚡ SasiVPS ⚡', 'font-size: 28px; font-weight: 900; color: #00ff88; text-shadow: 0 0 20px rgba(0,255,136,0.3);');
+        console.log('%cBuilt with ❤️ by Sasi', 'font-size: 14px; color: #b44dff;');
+        console.log('%c🚀 Running on Railway', 'font-size: 12px; color: #00d4ff;');
+        console.log('%c💚 Neon Theme Active', 'font-size: 12px; color: #00ff88;');
+
+        // ============================================================
+        // SECTION 30.10: PAGE LOAD ANIMATION
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const main = document.querySelector('main');
+            if (main) {
+                main.style.animation = 'fade-in 0.5s ease-out';
+            }
+
+            const flashMsg = sessionStorage.getItem('flash');
+            if (flashMsg) {
+                try {
+                    const data = JSON.parse(flashMsg);
+                    showToast(data.message, data.type || 'info');
+                } catch (e) {}
+                sessionStorage.removeItem('flash');
+            }
+        });
+
+        // ============================================================
+        // SECTION 30.11: NETWORK STATUS
+        // ============================================================
+        window.addEventListener('online', () => {
+            showToast('🟢 Back online!', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            showToast('🔴 You are offline', 'error');
+        });
+
+        // ============================================================
+        // SECTION 30.12: EXPOSE GLOBALS
+        // ============================================================
+        window.showToast = showToast;
+        window.apiRequest = apiRequest;
+        window.copyToClipboard = copyToClipboard;
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.toggleTheme = toggleTheme;
+        window.toggleMobileNav = toggleMobileNav;
+        window.toggleDropdown = toggleDropdown;
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
